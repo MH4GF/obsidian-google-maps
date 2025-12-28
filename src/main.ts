@@ -18,7 +18,7 @@ export default class GoogleMapsSyncPlugin extends Plugin {
 
   async syncGoogleMapsSaved(): Promise<void> {
     try {
-      const outputFolder = 'Google Maps/Places'
+      const outputFolder = this.settings.outputFolder || 'Google Maps/Places'
 
       // Ensure output folder exists
       if (!(await this.app.vault.adapter.exists(outputFolder))) {

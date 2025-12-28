@@ -1,4 +1,5 @@
 import { type App, PluginSettingTab, Setting } from 'obsidian'
+import { FolderSuggest } from './folder-suggest'
 import type GoogleMapsSyncPlugin from './main'
 
 export interface GoogleMapsSyncSettings {
@@ -25,14 +26,15 @@ export class GoogleMapsSyncSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName('Output folder')
       .setDesc('Folder where place notes will be created')
-      .addText((text) =>
-        text
+      .addSearch((search) => {
+        new FolderSuggest(this.app, search.inputEl)
+        search
           .setPlaceholder('Google Maps/Places')
           .setValue(this.plugin.settings.outputFolder)
           .onChange(async (value) => {
             this.plugin.settings.outputFolder = value
             await this.plugin.saveSettings()
-          }),
-      )
+          })
+      })
   }
 }
