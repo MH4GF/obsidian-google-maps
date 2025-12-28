@@ -1,0 +1,94 @@
+import type { Place } from './types'
+
+export type NoteGeneratorOptions = {
+  includeCoordinates?: boolean
+}
+
+/**
+ * Generate Markdown note content from Place
+ */
+export function generateNoteContent(place: Place, options: NoteGeneratorOptions = {}): string {
+  const { includeCoordinates = true } = options
+  const now = new Date().toISOString()
+
+  const frontmatter = buildFrontmatter(place, now, includeCoordinates)
+  const body = buildBody(place)
+
+  return `${frontmatter}\n${body}`
+}
+
+function buildFrontmatter(place: Place, syncedAt: string, includeCoordinates: boolean): string {
+  const lines: string[] = ['---']
+
+  lines.push('source: google-maps-takeout')
+  lines.push(`gmap_id: "${place.id}"`)
+
+  if (place.url) {
+    lines.push(`gmap_url: "${place.url}"`)
+  }
+
+  // Only include coordinates if we have valid ones
+  if (includeCoordinates && place.lat !== 0 && place.lng !== 0) {
+    lines.push(`coordinates: [${place.lat}, ${place.lng}]`)
+  }
+
+  if (place.address) {
+    lines.push(`address: "${escapeYamlString(place.address)}"`)
+  }
+
+  lines.push(`last_synced: "${syncedAt}"`)
+  lines.push('---')
+
+  return lines.join('\n')
+}
+
+function buildBody(place: Place): string {
+  const syncBlockLines: string[] = []
+
+  if (place.url) {
+    syncBlockLines.push(`- Google Maps: ${place.url}`)
+  }
+  if (place.address) {
+    syncBlockLines.push(`- Address: ${place.address}`)
+  }
+  if (place.lat !== 0 && place.lng !== 0) {
+    syncBlockLines.push(`- Coordinates: ${place.lat}, ${place.lng}`)
+  }
+
+  const syncBlock = syncBlockLines.length > 0 ? `\n${syncBlockLines.join('\n')}\n` : '\n'
+
+  return `
+# ${place.name}
+
+<!-- BEGIN:SYNC -->${syncBlock}<!-- END:SYNC -->
+
+## Memo
+`
+}
+
+/**
+ * Generate safe filename from place name and ID
+ */
+export function generateFileName(place: Place): string {
+  const safeName = sanitizeFileName(place.name)
+  const shortId = place.id.slice(-8)
+  return `${safeName} - ${shortId}.md`
+}
+
+/**
+ * Sanitize filename by removing/replacing invalid characters
+ */
+function sanitizeFileName(name: string): string {
+  return name
+    .replace(/[<>:"/\\|?*]/g, '') // Remove invalid chars
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .trim()
+    .slice(0, 100) // Limit length
+}
+
+/**
+ * Escape special characters in YAML string values
+ */
+function escapeYamlString(value: string): string {
+  return value.replace(/"/g, '\\"')
+}
