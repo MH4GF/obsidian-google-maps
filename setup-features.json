@@ -111,7 +111,7 @@
         { "type": "file", "file": "lefthook.yml", "exists": true },
         { "type": "command", "command": "lefthook install", "expectSuccess": true }
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "github-actions-ci",
