@@ -67,7 +67,7 @@
         { "type": "command", "command": "bun run lint:fix", "expectSuccess": true },
         { "type": "command", "command": "bun run all", "expectSuccess": true }
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "knip",
