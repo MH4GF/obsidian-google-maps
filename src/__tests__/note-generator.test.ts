@@ -2,6 +2,11 @@ import { describe, expect, test } from 'vitest'
 import { generateFileName, generateNoteContent } from '../note-generator'
 import type { Place } from '../types'
 
+/** Replace dynamic last_synced value with placeholder for snapshot testing */
+function normalizeSyncedAt(content: string): string {
+  return content.replace(/last_synced: "[^"]+"/g, 'last_synced: "[TIMESTAMP]"')
+}
+
 describe('generateNoteContent', () => {
   const basePlace: Place = {
     id: 'cid-12345678',
@@ -12,48 +17,31 @@ describe('generateNoteContent', () => {
     address: '港区芝公園4-2-8',
   }
 
-  test('frontmatterにcoordinates: [lat, lng]を含む', () => {
+  test('完全なノートコンテンツを生成する', () => {
     const content = generateNoteContent(basePlace)
+    const normalized = normalizeSyncedAt(content)
 
-    expect(content).toMatch(/coordinates:\s*\[35\.6586,\s*139\.7454\]/)
-  })
+    expect(normalized).toMatchInlineSnapshot(`
+      "---
+      source: google-maps-takeout
+      gmap_id: "cid-12345678"
+      gmap_url: "https://maps.google.com/?cid=12345678"
+      coordinates: [35.6586, 139.7454]
+      address: "港区芝公園4-2-8"
+      last_synced: "[TIMESTAMP]"
+      ---
 
-  test('frontmatterにsource, gmap_id, gmap_url, address, last_syncedを含む', () => {
-    const content = generateNoteContent(basePlace)
+      # 東京タワー
 
-    expect(content).toContain('source: google-maps-takeout')
-    expect(content).toContain('gmap_id: "cid-12345678"')
-    expect(content).toContain('gmap_url: "https://maps.google.com/?cid=12345678"')
-    expect(content).toContain('address: "港区芝公園4-2-8"')
-    expect(content).toMatch(/last_synced: "\d{4}-\d{2}-\d{2}T/)
-  })
+      <!-- BEGIN:SYNC -->
+      - Google Maps: https://maps.google.com/?cid=12345678
+      - Address: 港区芝公園4-2-8
+      - Coordinates: 35.6586, 139.7454
+      <!-- END:SYNC -->
 
-  test('同期ブロック（BEGIN:SYNC/END:SYNC）を含む', () => {
-    const content = generateNoteContent(basePlace)
-
-    expect(content).toContain('<!-- BEGIN:SYNC -->')
-    expect(content).toContain('<!-- END:SYNC -->')
-  })
-
-  test('同期ブロック内にURL、住所、座標を含む', () => {
-    const content = generateNoteContent(basePlace)
-
-    // 同期ブロック内の内容を確認
-    expect(content).toContain('- Google Maps: https://maps.google.com/?cid=12345678')
-    expect(content).toContain('- Address: 港区芝公園4-2-8')
-    expect(content).toContain('- Coordinates: 35.6586, 139.7454')
-  })
-
-  test('見出しに場所名を含む', () => {
-    const content = generateNoteContent(basePlace)
-
-    expect(content).toContain('# 東京タワー')
-  })
-
-  test('Memoセクションを含む', () => {
-    const content = generateNoteContent(basePlace)
-
-    expect(content).toContain('## Memo')
+      ## Memo
+      "
+    `)
   })
 
   test('座標がゼロの場合coordinatesを含まない', () => {
@@ -64,8 +52,57 @@ describe('generateNoteContent', () => {
     }
 
     const content = generateNoteContent(placeWithoutCoords)
+    const normalized = normalizeSyncedAt(content)
 
-    expect(content).not.toMatch(/coordinates:/)
+    expect(normalized).toMatchInlineSnapshot(`
+      "---
+      source: google-maps-takeout
+      gmap_id: "cid-12345678"
+      gmap_url: "https://maps.google.com/?cid=12345678"
+      address: "港区芝公園4-2-8"
+      last_synced: "[TIMESTAMP]"
+      ---
+
+      # 東京タワー
+
+      <!-- BEGIN:SYNC -->
+      - Google Maps: https://maps.google.com/?cid=12345678
+      - Address: 港区芝公園4-2-8
+      <!-- END:SYNC -->
+
+      ## Memo
+      "
+    `)
+  })
+
+  test('URLとaddressがない場合のノート生成', () => {
+    const minimalPlace: Place = {
+      id: 'hash-abc123',
+      name: 'テスト場所',
+      lat: 35.0,
+      lng: 139.0,
+    }
+
+    const content = generateNoteContent(minimalPlace)
+    const normalized = normalizeSyncedAt(content)
+
+    expect(normalized).toMatchInlineSnapshot(`
+      "---
+      source: google-maps-takeout
+      gmap_id: "hash-abc123"
+      coordinates: [35, 139]
+      last_synced: "[TIMESTAMP]"
+      ---
+
+      # テスト場所
+
+      <!-- BEGIN:SYNC -->
+      - Coordinates: 35, 139
+      <!-- END:SYNC -->
+
+      ## Memo
+      "
+    `)
   })
 })
 
@@ -78,9 +115,7 @@ describe('generateFileName', () => {
       lng: 139.7454,
     }
 
-    const fileName = generateFileName(place)
-
-    expect(fileName).toBe('東京タワー - 12345678.md')
+    expect(generateFileName(place)).toBe('東京タワー - 12345678.md')
   })
 
   test('特殊文字がサニタイズされる', () => {
@@ -91,10 +126,7 @@ describe('generateFileName', () => {
       lng: 139.7454,
     }
 
-    const fileName = generateFileName(place)
-
-    // / と : が削除される
-    expect(fileName).toBe('テスト場所名前 - 12345678.md')
+    expect(generateFileName(place)).toBe('テスト場所名前 - 12345678.md')
   })
 
   test('長い名前は100文字に切り詰められる', () => {
@@ -108,8 +140,7 @@ describe('generateFileName', () => {
 
     const fileName = generateFileName(place)
 
-    // 100文字 + " - " + shortId + ".md"
     expect(fileName.startsWith('あ'.repeat(100))).toBe(true)
-    expect(fileName).toContain(' - 12345678.md')
+    expect(fileName.endsWith(' - 12345678.md')).toBe(true)
   })
 })
