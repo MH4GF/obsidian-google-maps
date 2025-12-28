@@ -97,7 +97,7 @@
         { "type": "command", "command": "bun run test:coverage", "expectSuccess": true },
         { "type": "command", "command": "bun run all", "expectSuccess": true }
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "lefthook",

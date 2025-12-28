@@ -36,8 +36,10 @@ export default [
   globalIgnores([
     'node_modules',
     'dist',
+    'coverage',
     'esbuild.config.mjs',
     'eslint.config.mjs',
+    'vitest.config.ts',
     'version-bump.mjs',
     'versions.json',
     'main.js',
