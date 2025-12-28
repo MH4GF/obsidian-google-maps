@@ -124,7 +124,7 @@
       "acceptanceCriteria": [
         { "type": "file", "file": ".github/workflows/ci.yml", "exists": true }
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "renovate",
