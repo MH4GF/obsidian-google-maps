@@ -6,9 +6,9 @@ import {
 } from "./settings";
 
 export default class GoogleMapsSyncPlugin extends Plugin {
-  settings: GoogleMapsSyncSettings;
+  settings: GoogleMapsSyncSettings = DEFAULT_SETTINGS;
 
-  async onload() {
+  override async onload() {
     await this.loadSettings();
 
     this.addCommand({

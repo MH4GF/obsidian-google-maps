@@ -37,7 +37,7 @@
         { "type": "command", "command": "bun run typecheck", "expectSuccess": true },
         { "type": "command", "command": "bun run all", "expectSuccess": true }
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "biome",
