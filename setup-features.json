@@ -148,7 +148,7 @@
       "acceptanceCriteria": [
         { "type": "command", "command": "bun outdated", "expectSuccess": true }
       ],
-      "passes": false
+      "passes": true
     }
   ]
 }
