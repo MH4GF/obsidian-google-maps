@@ -23,7 +23,7 @@
       "enabled": true,
       "dependsOn": [],
       "acceptanceCriteria": [{ "type": "file", "file": ".node-version", "exists": true }],
-      "passes": false
+      "passes": true
     },
     {
       "id": "typescript",
