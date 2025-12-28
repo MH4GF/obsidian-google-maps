@@ -135,7 +135,7 @@
       "enabled": true,
       "dependsOn": ["package-manager"],
       "acceptanceCriteria": [{ "type": "file", "file": "renovate.json5", "exists": true }],
-      "passes": false
+      "passes": true
     },
     {
       "id": "deps-latest",
