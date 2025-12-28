@@ -1,36 +1,38 @@
-import {App, PluginSettingTab, Setting} from "obsidian";
-import MyPlugin from "./main";
+import { App, PluginSettingTab, Setting } from "obsidian";
+import GoogleMapsSyncPlugin from "./main";
 
-export interface MyPluginSettings {
-	mySetting: string;
+export interface GoogleMapsSyncSettings {
+  outputFolder: string;
 }
 
-export const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
+export const DEFAULT_SETTINGS: GoogleMapsSyncSettings = {
+  outputFolder: "Google Maps/Places",
+};
 
-export class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+export class GoogleMapsSyncSettingTab extends PluginSettingTab {
+  plugin: GoogleMapsSyncPlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
+  constructor(app: App, plugin: GoogleMapsSyncPlugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
 
-	display(): void {
-		const {containerEl} = this;
+  display(): void {
+    const { containerEl } = this;
 
-		containerEl.empty();
+    containerEl.empty();
 
-		new Setting(containerEl)
-			.setName('Settings #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
-	}
+    new Setting(containerEl)
+      .setName("Output folder")
+      .setDesc("Folder where place notes will be created")
+      .addText((text) =>
+        text
+          .setPlaceholder("Google Maps/Places")
+          .setValue(this.plugin.settings.outputFolder)
+          .onChange(async (value) => {
+            this.plugin.settings.outputFolder = value;
+            await this.plugin.saveSettings();
+          })
+      );
+  }
 }

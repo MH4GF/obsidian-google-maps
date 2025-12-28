@@ -1,99 +1,81 @@
-import {App, Editor, MarkdownView, Modal, Notice, Plugin} from 'obsidian';
-import {DEFAULT_SETTINGS, MyPluginSettings, SampleSettingTab} from "./settings";
+import { Notice, Plugin } from "obsidian";
+import {
+  DEFAULT_SETTINGS,
+  GoogleMapsSyncSettings,
+  GoogleMapsSyncSettingTab,
+} from "./settings";
 
-// Remember to rename these classes and interfaces!
+export default class GoogleMapsSyncPlugin extends Plugin {
+  settings: GoogleMapsSyncSettings;
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+  async onload() {
+    await this.loadSettings();
 
-	async onload() {
-		await this.loadSettings();
+    this.addCommand({
+      id: "sync-google-maps-saved",
+      name: "Sync Google Maps Saved",
+      callback: () => this.syncGoogleMapsSaved(),
+    });
 
-		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'Sample', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
+    this.addSettingTab(new GoogleMapsSyncSettingTab(this.app, this));
+  }
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
+  async syncGoogleMapsSaved() {
+    try {
+      const outputFolder = "Google Maps/Places";
 
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				editor.replaceSelection('Sample editor command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
+      // Ensure output folder exists
+      if (!(await this.app.vault.adapter.exists(outputFolder))) {
+        await this.app.vault.createFolder(outputFolder);
+      }
 
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-				return false;
-			}
-		});
+      // Generate dummy note for Tokyo Station
+      const fileName = `${outputFolder}/東京駅 - dummy.md`;
+      const now = new Date().toISOString();
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+      const content = `---
+source: google-maps-takeout
+gmap_id: dummy-tokyo-station
+gmap_url: https://maps.google.com/?cid=0
+coordinates: [35.6762, 139.6503]
+address: 東京都千代田区丸の内1丁目
+last_synced: ${now}
+---
 
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			new Notice("Click");
-		});
+# 東京駅
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+<!-- BEGIN:SYNC -->
+- Google Maps: https://maps.google.com/?cid=0
+- Address: 東京都千代田区丸の内1丁目
+- Coordinates: 35.6762, 139.6503
+<!-- END:SYNC -->
 
-	}
+## Memo
+`;
 
-	onunload() {
-	}
+      // Check if file already exists
+      if (await this.app.vault.adapter.exists(fileName)) {
+        new Notice("Note already exists: 東京駅 - dummy.md");
+        return;
+      }
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<MyPluginSettings>);
-	}
+      await this.app.vault.create(fileName, content);
+      new Notice("Created: 東京駅 - dummy.md");
+    } catch (error) {
+      console.error("Google Maps Sync error:", error);
+      new Notice(`Error: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  }
 
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
+  async loadSettings() {
+    this.settings = Object.assign(
+      {},
+      DEFAULT_SETTINGS,
+      (await this.loadData()) as Partial<GoogleMapsSyncSettings>
+    );
+  }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
+  async saveSettings() {
+    await this.saveData(this.settings);
+  }
 }
