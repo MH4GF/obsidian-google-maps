@@ -1,16 +1,16 @@
 {
-	"extends": "@mh4gf/configs/tsconfig/base.json",
-	"compilerOptions": {
-		"baseUrl": "src",
-		"inlineSourceMap": true,
-		"inlineSources": true,
-		"module": "ESNext",
-		"target": "ES6",
-		"allowJs": true,
-		"moduleResolution": "node",
-		"importHelpers": true,
-		"allowSyntheticDefaultImports": true,
-		"lib": ["DOM", "ES5", "ES6", "ES7"]
-	},
-	"include": ["src/**/*.ts"]
+  "extends": "@mh4gf/configs/tsconfig/base.json",
+  "compilerOptions": {
+    "baseUrl": "src",
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "module": "ESNext",
+    "target": "ES6",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": ["DOM", "ES5", "ES6", "ES7"]
+  },
+  "include": ["src/**/*.ts"]
 }

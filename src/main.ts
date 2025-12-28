@@ -1,37 +1,33 @@
-import { Notice, Plugin } from "obsidian";
-import {
-  DEFAULT_SETTINGS,
-  GoogleMapsSyncSettings,
-  GoogleMapsSyncSettingTab,
-} from "./settings";
+import { Notice, Plugin } from 'obsidian'
+import { DEFAULT_SETTINGS, type GoogleMapsSyncSettings, GoogleMapsSyncSettingTab } from './settings'
 
 export default class GoogleMapsSyncPlugin extends Plugin {
-  settings: GoogleMapsSyncSettings = DEFAULT_SETTINGS;
+  settings: GoogleMapsSyncSettings = DEFAULT_SETTINGS
 
-  override async onload() {
-    await this.loadSettings();
+  override async onload(): Promise<void> {
+    await this.loadSettings()
 
     this.addCommand({
-      id: "sync-google-maps-saved",
-      name: "Sync Google Maps Saved",
+      id: 'sync-google-maps-saved',
+      name: 'Sync Google Maps Saved',
       callback: () => this.syncGoogleMapsSaved(),
-    });
+    })
 
-    this.addSettingTab(new GoogleMapsSyncSettingTab(this.app, this));
+    this.addSettingTab(new GoogleMapsSyncSettingTab(this.app, this))
   }
 
-  async syncGoogleMapsSaved() {
+  async syncGoogleMapsSaved(): Promise<void> {
     try {
-      const outputFolder = "Google Maps/Places";
+      const outputFolder = 'Google Maps/Places'
 
       // Ensure output folder exists
       if (!(await this.app.vault.adapter.exists(outputFolder))) {
-        await this.app.vault.createFolder(outputFolder);
+        await this.app.vault.createFolder(outputFolder)
       }
 
       // Generate dummy note for Tokyo Station
-      const fileName = `${outputFolder}/東京駅 - dummy.md`;
-      const now = new Date().toISOString();
+      const fileName = `${outputFolder}/東京駅 - dummy.md`
+      const now = new Date().toISOString()
 
       const content = `---
 source: google-maps-takeout
@@ -51,31 +47,31 @@ last_synced: ${now}
 <!-- END:SYNC -->
 
 ## Memo
-`;
+`
 
       // Check if file already exists
       if (await this.app.vault.adapter.exists(fileName)) {
-        new Notice("Note already exists: 東京駅 - dummy.md");
-        return;
+        new Notice('Note already exists: 東京駅 - dummy.md')
+        return
       }
 
-      await this.app.vault.create(fileName, content);
-      new Notice("Created: 東京駅 - dummy.md");
+      await this.app.vault.create(fileName, content)
+      new Notice('Created: 東京駅 - dummy.md')
     } catch (error) {
-      console.error("Google Maps Sync error:", error);
-      new Notice(`Error: ${error instanceof Error ? error.message : "Unknown error"}`);
+      console.error('Google Maps Sync error:', error)
+      new Notice(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
-  async loadSettings() {
+  async loadSettings(): Promise<void> {
     this.settings = Object.assign(
       {},
       DEFAULT_SETTINGS,
-      (await this.loadData()) as Partial<GoogleMapsSyncSettings>
-    );
+      (await this.loadData()) as Partial<GoogleMapsSyncSettings>,
+    )
   }
 
-  async saveSettings() {
-    await this.saveData(this.settings);
+  async saveSettings(): Promise<void> {
+    await this.saveData(this.settings)
   }
 }

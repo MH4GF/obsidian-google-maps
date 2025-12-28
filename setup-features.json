@@ -52,7 +52,7 @@
         { "type": "command", "command": "bun run format:fix", "expectSuccess": true },
         { "type": "command", "command": "bun run all", "expectSuccess": true }
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "eslint",

@@ -1,38 +1,38 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
-import GoogleMapsSyncPlugin from "./main";
+import { type App, PluginSettingTab, Setting } from 'obsidian'
+import type GoogleMapsSyncPlugin from './main'
 
 export interface GoogleMapsSyncSettings {
-  outputFolder: string;
+  outputFolder: string
 }
 
 export const DEFAULT_SETTINGS: GoogleMapsSyncSettings = {
-  outputFolder: "Google Maps/Places",
-};
+  outputFolder: 'Google Maps/Places',
+}
 
 export class GoogleMapsSyncSettingTab extends PluginSettingTab {
-  plugin: GoogleMapsSyncPlugin;
+  plugin: GoogleMapsSyncPlugin
 
   constructor(app: App, plugin: GoogleMapsSyncPlugin) {
-    super(app, plugin);
-    this.plugin = plugin;
+    super(app, plugin)
+    this.plugin = plugin
   }
 
   display(): void {
-    const { containerEl } = this;
+    const { containerEl } = this
 
-    containerEl.empty();
+    containerEl.empty()
 
     new Setting(containerEl)
-      .setName("Output folder")
-      .setDesc("Folder where place notes will be created")
+      .setName('Output folder')
+      .setDesc('Folder where place notes will be created')
       .addText((text) =>
         text
-          .setPlaceholder("Google Maps/Places")
+          .setPlaceholder('Google Maps/Places')
           .setValue(this.plugin.settings.outputFolder)
           .onChange(async (value) => {
-            this.plugin.settings.outputFolder = value;
-            await this.plugin.saveSettings();
-          })
-      );
+            this.plugin.settings.outputFolder = value
+            await this.plugin.saveSettings()
+          }),
+      )
   }
 }
