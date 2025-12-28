@@ -82,7 +82,7 @@
         { "type": "command", "command": "bun run knip:fix", "expectSuccess": true },
         { "type": "command", "command": "bun run all", "expectSuccess": true }
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "vitest",
