@@ -1,4 +1,6 @@
 import { Notice, Plugin } from 'obsidian'
+import { parseGeoJSON } from './geojson-parser'
+import { generateFileName, generateNoteContent } from './note-generator'
 import { DEFAULT_SETTINGS, type GoogleMapsSyncSettings, GoogleMapsSyncSettingTab } from './settings'
 
 export default class GoogleMapsSyncPlugin extends Plugin {
@@ -18,6 +20,19 @@ export default class GoogleMapsSyncPlugin extends Plugin {
 
   async syncGoogleMapsSaved(): Promise<void> {
     try {
+      const file = await this.selectGeoJSONFile()
+      if (!file) {
+        return
+      }
+
+      const jsonString = await file.text()
+      const places = parseGeoJSON(jsonString)
+
+      if (places.length === 0) {
+        new Notice('No places found in the GeoJSON file')
+        return
+      }
+
       const outputFolder = this.settings.outputFolder || 'Google Maps/Places'
 
       // Ensure output folder exists
@@ -25,42 +40,48 @@ export default class GoogleMapsSyncPlugin extends Plugin {
         await this.app.vault.createFolder(outputFolder)
       }
 
-      // Generate dummy note for Tokyo Station
-      const fileName = `${outputFolder}/東京駅 - dummy.md`
-      const now = new Date().toISOString()
+      let created = 0
+      let skipped = 0
 
-      const content = `---
-source: google-maps-takeout
-gmap_id: dummy-tokyo-station
-gmap_url: https://maps.google.com/?cid=0
-coordinates: [35.6762, 139.6503]
-address: 東京都千代田区丸の内1丁目
-last_synced: ${now}
----
+      for (const place of places) {
+        const fileName = generateFileName(place)
+        const filePath = `${outputFolder}/${fileName}`
 
-# 東京駅
+        // Skip if file already exists
+        if (await this.app.vault.adapter.exists(filePath)) {
+          skipped++
+          continue
+        }
 
-<!-- BEGIN:SYNC -->
-- Google Maps: https://maps.google.com/?cid=0
-- Address: 東京都千代田区丸の内1丁目
-- Coordinates: 35.6762, 139.6503
-<!-- END:SYNC -->
-
-## Memo
-`
-
-      // Check if file already exists
-      if (await this.app.vault.adapter.exists(fileName)) {
-        new Notice('Note already exists: 東京駅 - dummy.md')
-        return
+        const content = generateNoteContent(place)
+        await this.app.vault.create(filePath, content)
+        created++
       }
 
-      await this.app.vault.create(fileName, content)
-      new Notice('Created: 東京駅 - dummy.md')
+      new Notice(`Sync complete: ${created} created, ${skipped} skipped`)
     } catch (error) {
       console.error('Google Maps Sync error:', error)
       new Notice(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
+  }
+
+  private selectGeoJSONFile(): Promise<File | null> {
+    return new Promise((resolve) => {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.json,.geojson'
+
+      input.onchange = (): void => {
+        const file = input.files?.[0] ?? null
+        resolve(file)
+      }
+
+      input.oncancel = (): void => {
+        resolve(null)
+      }
+
+      input.click()
+    })
   }
 
   async loadSettings(): Promise<void> {
