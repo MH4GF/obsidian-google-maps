@@ -106,6 +106,74 @@ describe('generateNoteContent', () => {
   })
 })
 
+describe('escapeYamlString - YAML特殊文字のエスケープ', () => {
+  const basePlaceWithAddress = (address: string): Place => ({
+    id: 'test-id',
+    name: 'Test Place',
+    lat: 35.0,
+    lng: 139.0,
+    address,
+  })
+
+  describe('バックスラッシュのエスケープ', () => {
+    test('バックスラッシュは二重にエスケープされる', () => {
+      const place = basePlaceWithAddress('C:\\Users\\test')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
+
+      expect(normalized).toContain('address: "C:\\\\Users\\\\test"')
+    })
+  })
+
+  describe('ダブルクォートのエスケープ', () => {
+    test('ダブルクォートはバックスラッシュでエスケープされる', () => {
+      const place = basePlaceWithAddress('He said "Hello"')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
+
+      expect(normalized).toContain('address: "He said \\"Hello\\""')
+    })
+  })
+
+  describe('改行文字のエスケープ', () => {
+    test('改行(LF)はエスケープシーケンスに変換される', () => {
+      const place = basePlaceWithAddress('Line1\nLine2')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
+
+      expect(normalized).toContain('address: "Line1\\nLine2"')
+    })
+
+    test('キャリッジリターン(CR)はエスケープシーケンスに変換される', () => {
+      const place = basePlaceWithAddress('Line1\rLine2')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
+
+      expect(normalized).toContain('address: "Line1\\rLine2"')
+    })
+  })
+
+  describe('タブ文字のエスケープ', () => {
+    test('タブ文字はエスケープシーケンスに変換される', () => {
+      const place = basePlaceWithAddress('Col1\tCol2')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
+
+      expect(normalized).toContain('address: "Col1\\tCol2"')
+    })
+  })
+
+  describe('複合ケース', () => {
+    test('複数の特殊文字が混在する場合、全てエスケープされる', () => {
+      const place = basePlaceWithAddress('Path: C:\\test\nNote: "important"')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
+
+      expect(normalized).toContain('address: "Path: C:\\\\test\\nNote: \\"important\\""')
+    })
+  })
+})
+
 describe('generateFileName', () => {
   test('ファイル名は{Place Name} - {shortId}.md形式', () => {
     const place: Place = {
