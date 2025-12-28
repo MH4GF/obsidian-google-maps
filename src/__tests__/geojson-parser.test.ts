@@ -140,4 +140,10 @@ describe('extractCoordsFromUrl', () => {
   test('座標がない場合はnullを返す', () => {
     expect(extractCoordsFromUrl('https://maps.google.com/')).toBeNull()
   })
+
+  // Issue #14: NaN検証追加
+  test.todo('不正な座標形式(NaN)の場合はnullを返す - ?q=形式')
+  test.todo('不正な座標形式(NaN)の場合はnullを返す - @形式')
+  test.todo('部分的にNaN(lat有効, lng無効)の場合はnullを返す')
+  test.todo('部分的にNaN(lat無効, lng有効)の場合はnullを返す')
 })
