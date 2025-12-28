@@ -88,7 +88,13 @@ function sanitizeFileName(name: string): string {
 
 /**
  * Escape special characters in YAML string values
+ * Order matters: backslash must be escaped first to avoid double-escaping
  */
 function escapeYamlString(value: string): string {
-  return value.replace(/"/g, '\\"')
+  return value
+    .replace(/\\/g, '\\\\') // Escape backslash first
+    .replace(/\n/g, '\\n') // Escape newline (LF)
+    .replace(/\r/g, '\\r') // Escape carriage return (CR)
+    .replace(/\t/g, '\\t') // Escape tab
+    .replace(/"/g, '\\"') // Escape double quote
 }

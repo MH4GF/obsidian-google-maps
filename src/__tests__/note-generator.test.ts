@@ -107,43 +107,70 @@ describe('generateNoteContent', () => {
 })
 
 describe('escapeYamlString - YAML特殊文字のエスケープ', () => {
-  // Helper: basePlaceWithAddress will be used when implementing test.todo cases
-  // const basePlaceWithAddress = (address: string): Place => ({
-  //   id: 'test-id', name: 'Test Place', lat: 35.0, lng: 139.0, address,
-  // })
+  const basePlaceWithAddress = (address: string): Place => ({
+    id: 'test-id',
+    name: 'Test Place',
+    lat: 35.0,
+    lng: 139.0,
+    address,
+  })
 
   describe('バックスラッシュのエスケープ', () => {
-    test.todo('バックスラッシュは二重にエスケープされる')
-    // 入力: "C:\\Users\\test"
-    // 期待: address: "C:\\\\Users\\\\test"
+    test('バックスラッシュは二重にエスケープされる', () => {
+      const place = basePlaceWithAddress('C:\\Users\\test')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
+
+      expect(normalized).toContain('address: "C:\\\\Users\\\\test"')
+    })
   })
 
   describe('ダブルクォートのエスケープ', () => {
-    test.todo('ダブルクォートはバックスラッシュでエスケープされる')
-    // 入力: 'He said "Hello"'
-    // 期待: address: "He said \\"Hello\\""
+    test('ダブルクォートはバックスラッシュでエスケープされる', () => {
+      const place = basePlaceWithAddress('He said "Hello"')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
+
+      expect(normalized).toContain('address: "He said \\"Hello\\""')
+    })
   })
 
   describe('改行文字のエスケープ', () => {
-    test.todo('改行(LF)はエスケープシーケンスに変換される')
-    // 入力: "Line1\nLine2"
-    // 期待: address: "Line1\\nLine2"
+    test('改行(LF)はエスケープシーケンスに変換される', () => {
+      const place = basePlaceWithAddress('Line1\nLine2')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
 
-    test.todo('キャリッジリターン(CR)はエスケープシーケンスに変換される')
-    // 入力: "Line1\rLine2"
-    // 期待: address: "Line1\\rLine2"
+      expect(normalized).toContain('address: "Line1\\nLine2"')
+    })
+
+    test('キャリッジリターン(CR)はエスケープシーケンスに変換される', () => {
+      const place = basePlaceWithAddress('Line1\rLine2')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
+
+      expect(normalized).toContain('address: "Line1\\rLine2"')
+    })
   })
 
   describe('タブ文字のエスケープ', () => {
-    test.todo('タブ文字はエスケープシーケンスに変換される')
-    // 入力: "Col1\tCol2"
-    // 期待: address: "Col1\\tCol2"
+    test('タブ文字はエスケープシーケンスに変換される', () => {
+      const place = basePlaceWithAddress('Col1\tCol2')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
+
+      expect(normalized).toContain('address: "Col1\\tCol2"')
+    })
   })
 
   describe('複合ケース', () => {
-    test.todo('複数の特殊文字が混在する場合、全てエスケープされる')
-    // 入力: "Path: C:\\test\nNote: \"important\""
-    // 期待: address: "Path: C:\\\\test\\nNote: \\"important\\""
+    test('複数の特殊文字が混在する場合、全てエスケープされる', () => {
+      const place = basePlaceWithAddress('Path: C:\\test\nNote: "important"')
+      const content = generateNoteContent(place)
+      const normalized = normalizeSyncedAt(content)
+
+      expect(normalized).toContain('address: "Path: C:\\\\test\\nNote: \\"important\\""')
+    })
   })
 })
 
