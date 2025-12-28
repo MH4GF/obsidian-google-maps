@@ -106,6 +106,47 @@ describe('generateNoteContent', () => {
   })
 })
 
+describe('escapeYamlString - YAML特殊文字のエスケープ', () => {
+  // Helper: basePlaceWithAddress will be used when implementing test.todo cases
+  // const basePlaceWithAddress = (address: string): Place => ({
+  //   id: 'test-id', name: 'Test Place', lat: 35.0, lng: 139.0, address,
+  // })
+
+  describe('バックスラッシュのエスケープ', () => {
+    test.todo('バックスラッシュは二重にエスケープされる')
+    // 入力: "C:\\Users\\test"
+    // 期待: address: "C:\\\\Users\\\\test"
+  })
+
+  describe('ダブルクォートのエスケープ', () => {
+    test.todo('ダブルクォートはバックスラッシュでエスケープされる')
+    // 入力: 'He said "Hello"'
+    // 期待: address: "He said \\"Hello\\""
+  })
+
+  describe('改行文字のエスケープ', () => {
+    test.todo('改行(LF)はエスケープシーケンスに変換される')
+    // 入力: "Line1\nLine2"
+    // 期待: address: "Line1\\nLine2"
+
+    test.todo('キャリッジリターン(CR)はエスケープシーケンスに変換される')
+    // 入力: "Line1\rLine2"
+    // 期待: address: "Line1\\rLine2"
+  })
+
+  describe('タブ文字のエスケープ', () => {
+    test.todo('タブ文字はエスケープシーケンスに変換される')
+    // 入力: "Col1\tCol2"
+    // 期待: address: "Col1\\tCol2"
+  })
+
+  describe('複合ケース', () => {
+    test.todo('複数の特殊文字が混在する場合、全てエスケープされる')
+    // 入力: "Path: C:\\test\nNote: \"important\""
+    // 期待: address: "Path: C:\\\\test\\nNote: \\"important\\""
+  })
+})
+
 describe('generateFileName', () => {
   test('ファイル名は{Place Name} - {shortId}.md形式', () => {
     const place: Place = {
