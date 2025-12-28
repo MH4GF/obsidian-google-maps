@@ -142,8 +142,21 @@ describe('extractCoordsFromUrl', () => {
   })
 
   // Issue #14: NaN検証追加
-  test.todo('不正な座標形式(NaN)の場合はnullを返す - ?q=形式')
-  test.todo('不正な座標形式(NaN)の場合はnullを返す - @形式')
-  test.todo('部分的にNaN(lat有効, lng無効)の場合はnullを返す')
-  test.todo('部分的にNaN(lat無効, lng有効)の場合はnullを返す')
+  test('不正な座標形式(NaN)の場合はnullを返す - ?q=形式', () => {
+    expect(extractCoordsFromUrl('https://maps.google.com/?q=abc,def')).toBeNull()
+  })
+
+  test('不正な座標形式(NaN)の場合はnullを返す - @形式', () => {
+    expect(extractCoordsFromUrl('https://maps.google.com/@abc,def,15z')).toBeNull()
+  })
+
+  test('部分的にNaN(lat有効, lng無効)の場合はnullを返す', () => {
+    expect(extractCoordsFromUrl('https://maps.google.com/?q=35.6586,abc')).toBeNull()
+    expect(extractCoordsFromUrl('https://maps.google.com/@35.6586,abc,15z')).toBeNull()
+  })
+
+  test('部分的にNaN(lat無効, lng有効)の場合はnullを返す', () => {
+    expect(extractCoordsFromUrl('https://maps.google.com/?q=abc,139.7454')).toBeNull()
+    expect(extractCoordsFromUrl('https://maps.google.com/@abc,139.7454,15z')).toBeNull()
+  })
 })
