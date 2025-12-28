@@ -12,7 +12,7 @@
       "acceptanceCriteria": [
         { "type": "command", "command": "bun install", "expectSuccess": true }
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "node-version",
