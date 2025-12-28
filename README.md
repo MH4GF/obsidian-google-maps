@@ -30,12 +30,11 @@ Sync your Google Maps saved places from Takeout export to your Obsidian vault.
    - Go to Community plugins
    - Find "Google Maps Sync" and enable it
 
-### Manual installation
+### From GitHub Releases
 
-1. Download `main.js` and `manifest.json` from the latest release
-2. Create a folder `obsidian-google-maps` in your vault's `.obsidian/plugins/` directory
-3. Copy `main.js` and `manifest.json` into the folder
-4. Enable the plugin in Obsidian Settings > Community plugins
+1. Download `obsidian-google-maps.zip` from the [latest release](https://github.com/MH4GF/obsidian-google-maps/releases/latest)
+2. Extract and place the `obsidian-google-maps` folder into your vault's `.obsidian/plugins/` directory
+3. Enable the plugin in Obsidian Settings > Community plugins
 
 ## Usage
 
