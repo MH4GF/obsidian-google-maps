@@ -1,4 +1,5 @@
 import { Notice, Plugin } from 'obsidian'
+import { findNoteByGmapId, loadNoteMetadata } from './duplicate-check'
 import { parseGeoJSON } from './geojson-parser'
 import { generateFileName, generateNoteContent } from './note-generator'
 import { DEFAULT_SETTINGS, type GoogleMapsSyncSettings, GoogleMapsSyncSettingTab } from './settings'
@@ -40,18 +41,22 @@ export default class GoogleMapsSyncPlugin extends Plugin {
         await this.app.vault.createFolder(outputFolder)
       }
 
+      // Load existing notes metadata for duplicate checking
+      const existingNotes = await loadNoteMetadata(this.app, outputFolder)
+
       let created = 0
       let skipped = 0
 
       for (const place of places) {
-        const fileName = generateFileName(place)
-        const filePath = `${outputFolder}/${fileName}`
-
-        // Skip if file already exists
-        if (await this.app.vault.adapter.exists(filePath)) {
+        // Check for duplicate by gmap_id
+        const existingNotePath = findNoteByGmapId(existingNotes, place.id, outputFolder)
+        if (existingNotePath) {
           skipped++
           continue
         }
+
+        const fileName = generateFileName(place)
+        const filePath = `${outputFolder}/${fileName}`
 
         const content = generateNoteContent(place)
         await this.app.vault.create(filePath, content)
