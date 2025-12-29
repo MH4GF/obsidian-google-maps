@@ -9,17 +9,17 @@ describe('findNoteByGmapId', () => {
     { path: 'Google Maps/Places/NoId.md', gmapId: undefined },
   ]
 
-  test.skip('gmap_id が一致するファイルパスを返す', () => {
+  test('gmap_id が一致するファイルパスを返す', () => {
     const result = findNoteByGmapId(sampleNotes, 'cid-12345678', 'Google Maps/Places')
     expect(result).toBe('Google Maps/Places/東京タワー - 12345678.md')
   })
 
-  test.skip('gmap_id が見つからない場合は null を返す', () => {
+  test('gmap_id が見つからない場合は null を返す', () => {
     const result = findNoteByGmapId(sampleNotes, 'cid-00000000', 'Google Maps/Places')
     expect(result).toBeNull()
   })
 
-  test.skip('指定フォルダ外のファイルは検索対象外', () => {
+  test('指定フォルダ外のファイルは検索対象外', () => {
     const result = findNoteByGmapId(sampleNotes, 'cid-99999999', 'Google Maps/Places')
     expect(result).toBeNull()
   })
