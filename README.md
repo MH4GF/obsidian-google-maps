@@ -6,7 +6,7 @@ Sync your Google Maps saved places from Takeout export to your Obsidian vault.
 
 - Import saved places from Google Takeout export
 - Generate one note per place with coordinates for Obsidian Bases Map view
-- Non-destructive sync: user edits in memo section are preserved
+- Non-destructive sync: existing places are detected by ID and skipped
 
 ## Installation
 
@@ -71,24 +71,13 @@ Example:
 
 ```markdown
 ---
+source: google-maps-takeout
 gmap_id: "cid-12345678"
 gmap_url: "https://maps.google.com/?cid=12345678"
 coordinates: [35.6586, 139.7454]
 address: "Shibakoen 4-2-8, Minato-ku"
 last_synced: "2024-01-15T12:00:00.000Z"
 ---
-
-# Tokyo Tower
-
-<!-- BEGIN:SYNC -->
-- Google Maps: https://maps.google.com/?cid=12345678
-- Address: Shibakoen 4-2-8, Minato-ku
-- Coordinates: 35.6586, 139.7454
-<!-- END:SYNC -->
-
-## Memo
-
-Your notes here (preserved during re-sync)
 ```
 
 ## Map View
