@@ -46,6 +46,7 @@ export default class GoogleMapsSyncPlugin extends Plugin {
 
       let created = 0
       let skipped = 0
+      const createdFileNames: string[] = []
 
       for (const place of places) {
         // Check for duplicate by gmap_id
@@ -55,11 +56,15 @@ export default class GoogleMapsSyncPlugin extends Plugin {
           continue
         }
 
-        const fileName = generateFileName(place)
+        // Combine existing files in folder with files created in this batch
+        const existingFileNames = existingNotes.map((n) => n.path.split('/').pop() ?? '')
+        const allFileNames = [...existingFileNames, ...createdFileNames]
+        const fileName = generateFileName(place, allFileNames)
         const filePath = `${outputFolder}/${fileName}`
 
         const content = generateNoteContent(place)
         await this.app.vault.create(filePath, content)
+        createdFileNames.push(fileName)
         created++
       }
 

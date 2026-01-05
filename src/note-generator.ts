@@ -67,12 +67,23 @@ function buildBody(place: Place): string {
 }
 
 /**
- * Generate safe filename from place name and ID
+ * Generate safe filename from place name
+ * Adds numeric suffix if collision with existing files
  */
-export function generateFileName(place: Place): string {
+export function generateFileName(place: Place, existingFiles: string[] = []): string {
   const safeName = sanitizeFileName(place.name)
-  const shortId = place.id.slice(-8)
-  return `${safeName} - ${shortId}.md`
+  const baseName = `${safeName}.md`
+
+  if (!existingFiles.includes(baseName)) {
+    return baseName
+  }
+
+  // Find smallest available suffix
+  let suffix = 1
+  while (existingFiles.includes(`${safeName} ${suffix}.md`)) {
+    suffix++
+  }
+  return `${safeName} ${suffix}.md`
 }
 
 /**
