@@ -68,9 +68,8 @@ bun run test:watch # Watch mode for tests
 ## Note format
 
 Generated place notes include:
-- **Frontmatter**: `coordinates: [lat, lng]`, `gmap_url`, `address`, `last_synced`
-- **Sync block**: `<!-- BEGIN:SYNC -->` / `<!-- END:SYNC -->` for auto-updated content
-- **Memo section**: preserved during sync (user edits outside sync blocks are kept)
+- **Frontmatter only**: `coordinates: [lat, lng]`, `gmap_url`, `address`, `last_synced`
+- Body is empty, allowing users to freely add their own content
 
 ## Manifest rules (`manifest.json`)
 

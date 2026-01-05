@@ -12,9 +12,8 @@ export function generateNoteContent(place: Place, options: NoteGeneratorOptions 
   const now = new Date().toISOString()
 
   const frontmatter = buildFrontmatter(place, now, includeCoordinates)
-  const body = buildBody(place)
 
-  return `${frontmatter}\n${body}`
+  return `${frontmatter}\n`
 }
 
 function buildFrontmatter(place: Place, syncedAt: string, includeCoordinates: boolean): string {
@@ -40,30 +39,6 @@ function buildFrontmatter(place: Place, syncedAt: string, includeCoordinates: bo
   lines.push('---')
 
   return lines.join('\n')
-}
-
-function buildBody(place: Place): string {
-  const syncBlockLines: string[] = []
-
-  if (place.url) {
-    syncBlockLines.push(`- Google Maps: ${place.url}`)
-  }
-  if (place.address) {
-    syncBlockLines.push(`- Address: ${place.address}`)
-  }
-  if (place.lat !== 0 && place.lng !== 0) {
-    syncBlockLines.push(`- Coordinates: ${place.lat}, ${place.lng}`)
-  }
-
-  const syncBlock = syncBlockLines.length > 0 ? `\n${syncBlockLines.join('\n')}\n` : '\n'
-
-  return `
-# ${place.name}
-
-<!-- BEGIN:SYNC -->${syncBlock}<!-- END:SYNC -->
-
-## Memo
-`
 }
 
 /**
