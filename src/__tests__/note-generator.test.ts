@@ -30,10 +30,6 @@ describe('generateNoteContent', () => {
       address: "港区芝公園4-2-8"
       last_synced: "[TIMESTAMP]"
       ---
-
-      # 東京タワー
-
-      ## Memo
       "
     `)
   })
@@ -56,10 +52,6 @@ describe('generateNoteContent', () => {
       address: "港区芝公園4-2-8"
       last_synced: "[TIMESTAMP]"
       ---
-
-      # 東京タワー
-
-      ## Memo
       "
     `)
   })
@@ -82,10 +74,6 @@ describe('generateNoteContent', () => {
       coordinates: [35, 139]
       last_synced: "[TIMESTAMP]"
       ---
-
-      # テスト場所
-
-      ## Memo
       "
     `)
   })

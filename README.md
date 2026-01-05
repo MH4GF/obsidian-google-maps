@@ -64,8 +64,8 @@ Re-running sync is safe: existing places are detected by ID and skipped.
 
 Each place note includes:
 
-- **Frontmatter**: `coordinates`, `gmap_url`, `address`, etc.
-- **Memo section**: Your personal notes (preserved during sync)
+- **Frontmatter only**: `coordinates`, `gmap_url`, `address`, etc.
+- Body is empty, allowing you to add your own content freely
 
 Example:
 

@@ -12,9 +12,8 @@ export function generateNoteContent(place: Place, options: NoteGeneratorOptions 
   const now = new Date().toISOString()
 
   const frontmatter = buildFrontmatter(place, now, includeCoordinates)
-  const body = buildBody(place)
 
-  return `${frontmatter}\n${body}`
+  return `${frontmatter}\n`
 }
 
 function buildFrontmatter(place: Place, syncedAt: string, includeCoordinates: boolean): string {
@@ -40,14 +39,6 @@ function buildFrontmatter(place: Place, syncedAt: string, includeCoordinates: bo
   lines.push('---')
 
   return lines.join('\n')
-}
-
-function buildBody(place: Place): string {
-  return `
-# ${place.name}
-
-## Memo
-`
 }
 
 /**
