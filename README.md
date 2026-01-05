@@ -38,9 +38,27 @@ Sync your Google Maps saved places from Takeout export to your Obsidian vault.
 
 ## Usage
 
+### 1. Export your saved places from Google Takeout
+
+1. Go to [Google Takeout](https://takeout.google.com/)
+2. Deselect all, then select only **Google Maps (your places)**
+3. Download and extract the archive
+4. Locate `Saved Places.json` (or `保存した場所.json` in Japanese)
+
+### 2. Run the sync command
+
 1. Open Command Palette (Cmd/Ctrl + P)
-2. Run "Sync Google Maps Saved"
-3. Notes will be created in `Google Maps/Places/` folder
+2. Run **Sync Google Maps Saved**
+3. Select the `Saved Places.json` file from the file picker
+4. Notes will be created in your configured output folder
+
+Re-running sync is safe: existing places are detected by ID and skipped.
+
+## Settings
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| Output Folder | Where place notes are created | `Google Maps/Places` |
 
 ## Note Format
 
@@ -50,9 +68,33 @@ Each place note includes:
 - **Sync block**: Auto-updated content between `<!-- BEGIN:SYNC -->` and `<!-- END:SYNC -->`
 - **Memo section**: Your personal notes (preserved during sync)
 
+Example:
+
+```markdown
+---
+gmap_id: "cid-12345678"
+gmap_url: "https://maps.google.com/?cid=12345678"
+coordinates: [35.6586, 139.7454]
+address: "Shibakoen 4-2-8, Minato-ku"
+last_synced: "2024-01-15T12:00:00.000Z"
+---
+
+# Tokyo Tower
+
+<!-- BEGIN:SYNC -->
+- Google Maps: https://maps.google.com/?cid=12345678
+- Address: Shibakoen 4-2-8, Minato-ku
+- Coordinates: 35.6586, 139.7454
+<!-- END:SYNC -->
+
+## Memo
+
+Your notes here (preserved during re-sync)
+```
+
 ## Map View
 
-Notes are compatible with Obsidian Bases Map view. The `coordinates` property contains `[lat, lng]` for map display.
+Notes work with [Obsidian Bases](https://help.obsidian.md/bases) (v1.9+). Create a Base with Map view to visualize your saved places on an interactive map. The `coordinates` property is automatically recognized.
 
 ## License
 
