@@ -33,12 +33,6 @@ describe('generateNoteContent', () => {
 
       # 東京タワー
 
-      <!-- BEGIN:SYNC -->
-      - Google Maps: https://maps.google.com/?cid=12345678
-      - Address: 港区芝公園4-2-8
-      - Coordinates: 35.6586, 139.7454
-      <!-- END:SYNC -->
-
       ## Memo
       "
     `)
@@ -65,11 +59,6 @@ describe('generateNoteContent', () => {
 
       # 東京タワー
 
-      <!-- BEGIN:SYNC -->
-      - Google Maps: https://maps.google.com/?cid=12345678
-      - Address: 港区芝公園4-2-8
-      <!-- END:SYNC -->
-
       ## Memo
       "
     `)
@@ -95,10 +84,6 @@ describe('generateNoteContent', () => {
       ---
 
       # テスト場所
-
-      <!-- BEGIN:SYNC -->
-      - Coordinates: 35, 139
-      <!-- END:SYNC -->
 
       ## Memo
       "
