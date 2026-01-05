@@ -21,7 +21,7 @@ export default class GoogleMapsSyncPlugin extends Plugin {
 
   async syncGoogleMapsSaved(): Promise<void> {
     try {
-      const file = await this.selectGeoJSONFile()
+      const file = await this.selectJSONFile()
       if (!file) {
         return
       }
@@ -75,11 +75,11 @@ export default class GoogleMapsSyncPlugin extends Plugin {
     }
   }
 
-  private selectGeoJSONFile(): Promise<File | null> {
+  private selectJSONFile(): Promise<File | null> {
     return new Promise((resolve) => {
       const input = document.createElement('input')
       input.type = 'file'
-      input.accept = '.json,.geojson'
+      input.accept = '.json'
 
       input.onchange = (): void => {
         const file = input.files?.[0] ?? null
