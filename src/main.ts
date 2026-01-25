@@ -1,10 +1,13 @@
 import { Notice, Plugin } from 'obsidian'
-import { findNoteByGmapId, loadNoteMetadata } from './duplicate-check'
-import { parseGeoJSON } from './geojson-parser'
-import { generateFileName, generateNoteContent } from './note-generator'
+import { DEFAULT_SETTINGS } from './constants'
+import { findNoteByGmapId } from './findNoteByGmapId'
+import { GoogleMapsSyncSettingTab } from './GoogleMapsSyncSettingTab'
+import { generateFileName } from './generateFileName'
+import { generateNoteContent } from './generateNoteContent'
+import { loadNoteMetadata } from './loadNoteMetadata'
 import { parseCsv } from './parseCsv'
-import { DEFAULT_SETTINGS, type GoogleMapsSyncSettings, GoogleMapsSyncSettingTab } from './settings'
-import type { Place } from './types'
+import { parseGeoJSON } from './parseGeoJSON'
+import type { GoogleMapsSyncSettings, Place } from './types'
 
 export default class GoogleMapsSyncPlugin extends Plugin {
   settings: GoogleMapsSyncSettings = DEFAULT_SETTINGS
