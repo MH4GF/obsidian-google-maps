@@ -32,7 +32,8 @@ export default class GoogleMapsSyncPlugin extends Plugin {
       let places: Place[]
       if (file.name.endsWith('.csv')) {
         console.log('[Google Maps Sync] Parsing CSV file:', file.name)
-        places = parseCsv(content)
+        const listName = file.name.replace(/\.csv$/i, '')
+        places = parseCsv(content).map((p) => ({ ...p, list: listName }))
       } else {
         console.log('[Google Maps Sync] Parsing GeoJSON file:', file.name)
         places = parseGeoJSON(content)

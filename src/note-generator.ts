@@ -22,6 +22,10 @@ function buildFrontmatter(place: Place, syncedAt: string, includeCoordinates: bo
   lines.push('source: google-maps-takeout')
   lines.push(`gmap_id: "${place.id}"`)
 
+  if (place.list) {
+    lines.push(`list: "${escapeYamlString(place.list)}"`)
+  }
+
   if (place.url) {
     lines.push(`gmap_url: "${place.url}"`)
   }

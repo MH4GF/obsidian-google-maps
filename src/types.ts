@@ -11,6 +11,7 @@ export type Place = {
   memo?: string
   tags?: string
   comment?: string
+  list?: string
 }
 
 /**
