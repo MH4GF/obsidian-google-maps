@@ -1,3 +1,7 @@
+export interface GoogleMapsSyncSettings {
+  outputFolder: string
+}
+
 /**
  * Internal Place model - normalized from various input formats
  */
@@ -25,14 +29,6 @@ export type TakeoutCsvRow = {
   comment: string
 }
 
-/**
- * Google Takeout GeoJSON structure (保存した場所.json)
- */
-export type TakeoutGeoJSON = {
-  type: 'FeatureCollection'
-  features: TakeoutFeature[]
-}
-
 export type TakeoutFeature = {
   type: 'Feature'
   geometry: {
@@ -48,4 +44,21 @@ export type TakeoutFeature = {
     google_maps_url?: string
     date?: string
   }
+}
+
+/**
+ * Google Takeout GeoJSON structure (保存した場所.json)
+ */
+export type TakeoutGeoJSON = {
+  type: 'FeatureCollection'
+  features: TakeoutFeature[]
+}
+
+export interface NoteMetadata {
+  path: string
+  gmapId: string | undefined
+}
+
+export type NoteGeneratorOptions = {
+  includeCoordinates?: boolean
 }
