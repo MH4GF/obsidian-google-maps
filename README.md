@@ -10,31 +10,9 @@ Sync your Google Maps saved places from Takeout export to your Obsidian vault.
 
 ## Installation
 
-### From source (development)
-
-1. Clone this repository into your vault's plugins folder:
-   ```bash
-   cd /path/to/your/vault/.obsidian/plugins
-   git clone https://github.com/MH4GF/obsidian-google-maps.git
-   cd obsidian-google-maps
-   ```
-
-2. Install dependencies and build:
-   ```bash
-   npm install
-   npm run build
-   ```
-
-3. Enable the plugin:
-   - Open Obsidian Settings
-   - Go to Community plugins
-   - Find "Google Maps Sync" and enable it
-
-### From GitHub Releases
-
 1. Download `obsidian-google-maps.zip` from the [latest release](https://github.com/MH4GF/obsidian-google-maps/releases/latest)
 2. Extract and place the `obsidian-google-maps` folder into your vault's `.obsidian/plugins/` directory
-3. Enable the plugin in Obsidian Settings > Community plugins
+3. Enable the plugin in **Settings → Community plugins**
 
 ## Usage
 
@@ -83,6 +61,27 @@ last_synced: "2024-01-15T12:00:00.000Z"
 ## Map View
 
 Notes work with [Obsidian Bases](https://help.obsidian.md/bases) (v1.9+). Create a Base with Map view to visualize your saved places on an interactive map. The `coordinates` property is automatically recognized.
+
+## Development
+
+For contributors and developers who want to build from source:
+
+1. Clone this repository into your vault's plugins folder:
+   ```bash
+   cd /path/to/your/vault/.obsidian/plugins
+   git clone https://github.com/MH4GF/obsidian-google-maps.git
+   cd obsidian-google-maps
+   ```
+
+2. Install dependencies and build:
+   ```bash
+   bun install
+   bun run build
+   ```
+
+3. Enable the plugin in **Settings → Community plugins**
+
+See [AGENTS.md](AGENTS.md) for detailed development instructions.
 
 ## License
 
