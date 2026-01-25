@@ -1,6 +1,6 @@
 {
   "name": "obsidian-google-maps",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Sync your Google Maps saved places from Takeout export to your vault",
   "main": "main.js",
   "type": "module",
