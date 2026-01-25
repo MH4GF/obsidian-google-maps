@@ -7,8 +7,33 @@
         "useImportExtensions": "off"
       },
       "style": {
-        "noDefaultExport": "off"
+        "noDefaultExport": "off",
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "filenameCases": ["export"]
+          }
+        }
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "*.config.*",
+        "**/__tests__/**",
+        "version-bump.mjs",
+        "src/main.ts",
+        "src/types.ts",
+        "src/constants.ts"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    }
+  ]
 }
