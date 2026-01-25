@@ -1,7 +1,7 @@
 {
   "id": "google-maps-sync",
   "name": "Google Maps Sync",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "minAppVersion": "0.15.0",
   "description": "Sync your Google Maps saved places from Takeout export to your vault.",
   "author": "MH4GF",
