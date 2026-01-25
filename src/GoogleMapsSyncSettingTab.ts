@@ -1,14 +1,6 @@
 import { type App, PluginSettingTab, Setting } from 'obsidian'
-import { FolderSuggest } from './folder-suggest'
+import { FolderSuggest } from './FolderSuggest'
 import type GoogleMapsSyncPlugin from './main'
-
-export interface GoogleMapsSyncSettings {
-  outputFolder: string
-}
-
-export const DEFAULT_SETTINGS: GoogleMapsSyncSettings = {
-  outputFolder: 'Google Maps/Places',
-}
 
 export class GoogleMapsSyncSettingTab extends PluginSettingTab {
   plugin: GoogleMapsSyncPlugin

@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
-import { findNoteByGmapId, type NoteMetadata } from '../duplicate-check'
+import { findNoteByGmapId } from '../findNoteByGmapId'
+import type { NoteMetadata } from '../types'
 
 describe('findNoteByGmapId', () => {
   const sampleNotes: NoteMetadata[] = [
