@@ -208,3 +208,61 @@ describe('generateFileName', () => {
     expect(generateFileName(place, existingFiles)).toBe('スターバックス 3.md')
   })
 })
+
+describe('CSV由来のフィールド対応', () => {
+  test('memo/tags/commentがfrontmatterに含まれる', () => {
+    const place: Place = {
+      id: 'pid-test',
+      name: 'テスト場所',
+      lat: 0,
+      lng: 0,
+      memo: 'これはメモです',
+      tags: 'カフェ',
+      comment: 'コメント内容',
+    }
+
+    const content = generateNoteContent(place)
+    const normalized = normalizeSyncedAt(content)
+
+    expect(normalized).toMatchInlineSnapshot(`
+      "---
+      source: google-maps-takeout
+      gmap_id: "pid-test"
+      tags: ["カフェ"]
+      memo: "これはメモです"
+      comment: "コメント内容"
+      last_synced: "[TIMESTAMP]"
+      ---
+      "
+    `)
+  })
+
+  test('memo/tags/commentが空の場合はfrontmatterに含まれない', () => {
+    const place: Place = {
+      id: 'pid-test',
+      name: 'テスト場所',
+      lat: 0,
+      lng: 0,
+    }
+
+    const content = generateNoteContent(place)
+
+    expect(content).not.toContain('memo:')
+    expect(content).not.toContain('tags:')
+    expect(content).not.toContain('comment:')
+  })
+
+  test('memo内の特殊文字がエスケープされる', () => {
+    const place: Place = {
+      id: 'pid-test',
+      name: 'テスト場所',
+      lat: 0,
+      lng: 0,
+      memo: 'Line1\nLine2',
+    }
+
+    const content = generateNoteContent(place)
+
+    expect(content).toContain('memo: "Line1\\nLine2"')
+  })
+})

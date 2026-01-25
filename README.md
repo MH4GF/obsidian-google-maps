@@ -4,8 +4,8 @@ Sync your Google Maps saved places from Takeout export to your Obsidian vault.
 
 ## Features
 
-- Import saved places from Google Takeout export
-- Generate one note per place with coordinates for Obsidian Bases Map view
+- Import saved places from Google Takeout export (GeoJSON and CSV)
+- Generate one note per place with coordinates for [Obsidian Bases](https://help.obsidian.md/bases) Map view
 - Non-destructive sync: existing places are detected by ID and skipped
 
 ## Installation
@@ -21,16 +21,16 @@ Sync your Google Maps saved places from Takeout export to your Obsidian vault.
 1. Go to [Google Takeout](https://takeout.google.com/)
 2. Deselect all, then select only **Google Maps (your places)**
 3. Download and extract the archive
-4. Locate `Saved Places.json` (or `保存した場所.json` in Japanese)
+4. Locate export files:
+   - **GeoJSON**: `Saved Places.json` (includes coordinates)
+   - **CSV**: Files in the lists folder, e.g., `Favourites.csv` (no coordinates)
 
 ### 2. Run the sync command
 
 1. Open Command Palette (Cmd/Ctrl + P)
 2. Run **Sync Google Maps Saved**
-3. Select the `Saved Places.json` file from the file picker
+3. Select a `.json` or `.csv` file
 4. Notes will be created in your configured output folder
-
-Re-running sync is safe: existing places are detected by ID and skipped.
 
 ## Settings
 
@@ -40,12 +40,7 @@ Re-running sync is safe: existing places are detected by ID and skipped.
 
 ## Note Format
 
-Each place note includes:
-
-- **Frontmatter only**: `coordinates`, `gmap_url`, `address`, etc.
-- Body is empty, allowing you to add your own content freely
-
-Example:
+Each place note contains frontmatter only, leaving the body empty for your own content:
 
 ```markdown
 ---
@@ -58,9 +53,7 @@ last_synced: "2024-01-15T12:00:00.000Z"
 ---
 ```
 
-## Map View
-
-Notes work with [Obsidian Bases](https://help.obsidian.md/bases) (v1.9+). Create a Base with Map view to visualize your saved places on an interactive map. The `coordinates` property is automatically recognized.
+**Note**: CSV files do not include coordinates. Use GeoJSON for Map view.
 
 ## Development
 

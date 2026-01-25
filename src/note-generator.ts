@@ -35,6 +35,18 @@ function buildFrontmatter(place: Place, syncedAt: string, includeCoordinates: bo
     lines.push(`address: "${escapeYamlString(place.address)}"`)
   }
 
+  if (place.tags) {
+    lines.push(`tags: ["${escapeYamlString(place.tags)}"]`)
+  }
+
+  if (place.memo) {
+    lines.push(`memo: "${escapeYamlString(place.memo)}"`)
+  }
+
+  if (place.comment) {
+    lines.push(`comment: "${escapeYamlString(place.comment)}"`)
+  }
+
   lines.push(`last_synced: "${syncedAt}"`)
   lines.push('---')
 

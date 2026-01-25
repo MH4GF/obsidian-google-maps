@@ -2,7 +2,9 @@ import { Notice, Plugin } from 'obsidian'
 import { findNoteByGmapId, loadNoteMetadata } from './duplicate-check'
 import { parseGeoJSON } from './geojson-parser'
 import { generateFileName, generateNoteContent } from './note-generator'
+import { parseCsv } from './parseCsv'
 import { DEFAULT_SETTINGS, type GoogleMapsSyncSettings, GoogleMapsSyncSettingTab } from './settings'
+import type { Place } from './types'
 
 export default class GoogleMapsSyncPlugin extends Plugin {
   settings: GoogleMapsSyncSettings = DEFAULT_SETTINGS
@@ -21,16 +23,24 @@ export default class GoogleMapsSyncPlugin extends Plugin {
 
   async syncGoogleMapsSaved(): Promise<void> {
     try {
-      const file = await this.selectJSONFile()
+      const file = await this.selectDataFile()
       if (!file) {
         return
       }
 
-      const jsonString = await file.text()
-      const places = parseGeoJSON(jsonString)
+      const content = await file.text()
+      let places: Place[]
+      if (file.name.endsWith('.csv')) {
+        console.log('[Google Maps Sync] Parsing CSV file:', file.name)
+        places = parseCsv(content)
+      } else {
+        console.log('[Google Maps Sync] Parsing GeoJSON file:', file.name)
+        places = parseGeoJSON(content)
+      }
+      console.log('[Google Maps Sync] Parsed places:', places.length)
 
       if (places.length === 0) {
-        new Notice('No places found in the GeoJSON file')
+        new Notice('No places found in the file')
         return
       }
 
@@ -75,11 +85,11 @@ export default class GoogleMapsSyncPlugin extends Plugin {
     }
   }
 
-  private selectJSONFile(): Promise<File | null> {
+  private selectDataFile(): Promise<File | null> {
     return new Promise((resolve) => {
       const input = document.createElement('input')
       input.type = 'file'
-      input.accept = '.json'
+      input.accept = '.json,.csv'
 
       input.onchange = (): void => {
         const file = input.files?.[0] ?? null

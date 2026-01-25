@@ -8,6 +8,20 @@ export type Place = {
   lat: number
   lng: number
   address?: string
+  memo?: string
+  tags?: string
+  comment?: string
+}
+
+/**
+ * Google Takeout CSV structure (保存済み/*.csv)
+ */
+export type TakeoutCsvRow = {
+  title: string
+  memo: string
+  url: string
+  tags: string
+  comment: string
 }
 
 /**

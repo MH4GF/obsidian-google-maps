@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { extractCidFromUrl, extractCoordsFromUrl, parseGeoJSON } from '../geojson-parser'
+import { extractCoordsFromUrl, parseGeoJSON } from '../geojson-parser'
 
 describe('parseGeoJSON', () => {
   test('FeatureCollectionをPlace[]に変換できる', () => {
@@ -113,16 +113,6 @@ describe('parseGeoJSON', () => {
 
   test('不正なGeoJSON形式でエラーを投げる', () => {
     expect(() => parseGeoJSON('{"type": "Invalid"}')).toThrow('Invalid GeoJSON')
-  })
-})
-
-describe('extractCidFromUrl', () => {
-  test('cid=で始まるパラメータを抽出する', () => {
-    expect(extractCidFromUrl('https://maps.google.com/?cid=12345')).toBe('12345')
-  })
-
-  test('cidがない場合はnullを返す', () => {
-    expect(extractCidFromUrl('https://maps.google.com/')).toBeNull()
   })
 })
 

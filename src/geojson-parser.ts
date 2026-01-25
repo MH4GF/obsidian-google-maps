@@ -1,3 +1,5 @@
+import { extractIdFromUrl } from './extractIdFromUrl'
+import { generateHashId } from './generateHashId'
 import type { Place, TakeoutFeature, TakeoutGeoJSON } from './types'
 
 /**
@@ -60,15 +62,6 @@ function parseFeature(feature: TakeoutFeature): Place | null {
 }
 
 /**
- * Extract cid from Google Maps URL
- * Example: https://maps.google.com/?cid=12345 -> "12345"
- */
-export function extractCidFromUrl(url: string): string | null {
-  const match = url.match(/[?&]cid=(\d+)/)
-  return match?.[1] ?? null
-}
-
-/**
  * Extract coordinates from URL query parameter
  * Example: https://maps.google.com/?q=35.658,139.745 -> { lat: 35.658, lng: 139.745 }
  */
@@ -98,36 +91,4 @@ export function extractCoordsFromUrl(url: string): { lat: number; lng: number } 
   }
 
   return null
-}
-
-/**
- * Extract stable ID from Google Maps URL
- * Priority: cid > place_id pattern > hash
- */
-function extractIdFromUrl(url: string | undefined): string | null {
-  if (!url) return null
-
-  // Try cid first
-  const cid = extractCidFromUrl(url)
-  if (cid) return `cid-${cid}`
-
-  // Try 0x...:0x... pattern (place_id in some URLs)
-  const placeIdMatch = url.match(/(0x[a-f0-9]+:0x[a-f0-9]+)/i)
-  if (placeIdMatch) return `pid-${placeIdMatch[1]}`
-
-  return null
-}
-
-/**
- * Generate hash-based ID as fallback
- */
-function generateHashId(name: string, address?: string): string {
-  const input = `${name}|${address ?? ''}`
-  let hash = 0
-  for (let i = 0; i < input.length; i++) {
-    const char = input.charCodeAt(i)
-    hash = (hash << 5) - hash + char
-    hash = hash & hash // Convert to 32bit integer
-  }
-  return `hash-${Math.abs(hash).toString(16)}`
 }
