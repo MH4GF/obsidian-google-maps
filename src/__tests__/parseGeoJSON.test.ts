@@ -108,10 +108,78 @@ describe('parseGeoJSON', () => {
   })
 
   test('不正なJSON構文でエラーを投げる', () => {
-    expect(() => parseGeoJSON('invalid json')).toThrow('Failed to parse GeoJSON')
+    expect(() => parseGeoJSON('invalid json')).toThrow(SyntaxError)
   })
 
   test('不正なGeoJSON形式でエラーを投げる', () => {
     expect(() => parseGeoJSON('{"type": "Invalid"}')).toThrow('Invalid GeoJSON')
+  })
+
+  test('geometryがnullの場合座標は0になる', () => {
+    const geojson = JSON.stringify({
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: null,
+          properties: {
+            location: { name: 'テスト' },
+            google_maps_url: 'https://maps.google.com/',
+          },
+        },
+      ],
+    })
+
+    const places = parseGeoJSON(geojson)
+    const place = places[0]
+
+    expect(places).toHaveLength(1)
+    expect(place?.lat).toBe(0)
+    expect(place?.lng).toBe(0)
+  })
+
+  test('coordinatesがnullの場合座標は0になる', () => {
+    const geojson = JSON.stringify({
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: null },
+          properties: {
+            location: { name: 'テスト' },
+          },
+        },
+      ],
+    })
+
+    const places = parseGeoJSON(geojson)
+    const place = places[0]
+
+    expect(places).toHaveLength(1)
+    expect(place?.lat).toBe(0)
+    expect(place?.lng).toBe(0)
+  })
+
+  test('座標ゼロでURLから抽出失敗の場合は座標0のまま', () => {
+    const geojson = JSON.stringify({
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [0, 0] },
+          properties: {
+            location: { name: 'テスト' },
+            google_maps_url: 'https://maps.google.com/',
+          },
+        },
+      ],
+    })
+
+    const places = parseGeoJSON(geojson)
+    const place = places[0]
+
+    expect(places).toHaveLength(1)
+    expect(place?.lat).toBe(0)
+    expect(place?.lng).toBe(0)
   })
 })

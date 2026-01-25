@@ -34,4 +34,15 @@ describe('extractCoordsFromUrl', () => {
     expect(extractCoordsFromUrl('https://maps.google.com/?q=abc,139.7454')).toBeNull()
     expect(extractCoordsFromUrl('https://maps.google.com/@abc,139.7454,15z')).toBeNull()
   })
+
+  test('正規表現にマッチするがparseFloatでNaNになる値の場合はnullを返す - ?q=形式', () => {
+    // '.' や '-' は正規表現 [-\d.]+ にマッチするが parseFloat で NaN になる
+    expect(extractCoordsFromUrl('https://maps.google.com/?q=.,139.7454')).toBeNull()
+    expect(extractCoordsFromUrl('https://maps.google.com/?q=35.6586,.')).toBeNull()
+  })
+
+  test('正規表現にマッチするがparseFloatでNaNになる値の場合はnullを返す - @形式', () => {
+    expect(extractCoordsFromUrl('https://maps.google.com/@.,139.7454,15z')).toBeNull()
+    expect(extractCoordsFromUrl('https://maps.google.com/@35.6586,.,15z')).toBeNull()
+  })
 })

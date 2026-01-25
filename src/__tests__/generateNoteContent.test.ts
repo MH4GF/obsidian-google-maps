@@ -77,6 +77,30 @@ describe('generateNoteContent', () => {
       "
     `)
   })
+
+  test('listがある場合frontmatterに含まれる', () => {
+    const placeWithList: Place = {
+      id: 'test-id',
+      name: 'テスト場所',
+      lat: 35.0,
+      lng: 139.0,
+      list: 'お気に入り',
+    }
+
+    const content = generateNoteContent(placeWithList)
+    const normalized = normalizeSyncedAt(content)
+
+    expect(normalized).toMatchInlineSnapshot(`
+      "---
+      source: google-maps-takeout
+      gmap_id: "test-id"
+      list: "お気に入り"
+      coordinates: [35, 139]
+      last_synced: "[TIMESTAMP]"
+      ---
+      "
+    `)
+  })
 })
 
 describe('escapeYamlString - YAML特殊文字のエスケープ', () => {
@@ -263,6 +287,15 @@ gmap_id: "test-id"
 ---`
 
     expect(extractBody(content)).toBe('')
+  })
+
+  test('frontmatter終了マーカーがない不完全なコンテンツはそのまま返す', () => {
+    // frontmatter開始はあるが、終了マーカー(\n---\nまたは\n---EOF)がない
+    const content = `---
+gmap_id: "test-id"
+some content without closing frontmatter`
+
+    expect(extractBody(content)).toBe(content)
   })
 })
 

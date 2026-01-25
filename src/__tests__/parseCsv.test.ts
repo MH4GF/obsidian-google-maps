@@ -177,4 +177,52 @@ describe('parseCsv', () => {
     expect(places[1]?.name).toBe('場所B')
     expect(places[1]?.memo).toBe('通常メモ')
   })
+
+  test('Windows改行(CRLF)を正しく処理する', () => {
+    const csv =
+      'タイトル,メモ,URL,タグ,コメント\r\n場所A,,https://example.com,,\r\n場所B,,https://example.com,,'
+
+    const places = parseCsv(csv)
+
+    expect(places).toHaveLength(2)
+    expect(places[0]?.name).toBe('場所A')
+    expect(places[1]?.name).toBe('場所B')
+  })
+
+  test('空行をスキップする', () => {
+    const csv = `タイトル,メモ,URL,タグ,コメント
+場所A,,https://example.com,,
+
+場所B,,https://example.com,,`
+
+    const places = parseCsv(csv)
+
+    expect(places).toHaveLength(2)
+    expect(places[0]?.name).toBe('場所A')
+    expect(places[1]?.name).toBe('場所B')
+  })
+
+  test('フィールド数が5未満の行をスキップする', () => {
+    const csv = `タイトル,メモ,URL,タグ,コメント
+場所A,,https://example.com,,
+不完全な行,のみ
+場所B,,https://example.com,,`
+
+    const places = parseCsv(csv)
+
+    expect(places).toHaveLength(2)
+    expect(places[0]?.name).toBe('場所A')
+    expect(places[1]?.name).toBe('場所B')
+  })
+
+  test('CR改行のみ(旧Mac形式)を正しく処理する', () => {
+    const csv =
+      'タイトル,メモ,URL,タグ,コメント\r場所A,,https://example.com,,\r場所B,,https://example.com,,'
+
+    const places = parseCsv(csv)
+
+    expect(places).toHaveLength(2)
+    expect(places[0]?.name).toBe('場所A')
+    expect(places[1]?.name).toBe('場所B')
+  })
 })

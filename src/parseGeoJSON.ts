@@ -7,14 +7,7 @@ import type { Place, TakeoutFeature, TakeoutGeoJSON } from './types'
  * Parse Google Takeout GeoJSON (保存した場所.json) into Place array
  */
 export function parseGeoJSON(jsonString: string): Place[] {
-  let data: TakeoutGeoJSON
-  try {
-    data = JSON.parse(jsonString) as TakeoutGeoJSON
-  } catch (error) {
-    throw new Error(
-      `Failed to parse GeoJSON: ${error instanceof Error ? error.message : 'Invalid JSON'}`,
-    )
-  }
+  const data = JSON.parse(jsonString) as TakeoutGeoJSON
 
   if (data.type !== 'FeatureCollection' || !Array.isArray(data.features)) {
     throw new Error('Invalid GeoJSON: expected FeatureCollection with features array')
