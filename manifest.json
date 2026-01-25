@@ -1,9 +1,9 @@
 {
-  "id": "obsidian-google-maps",
+  "id": "google-maps-sync",
   "name": "Google Maps Sync",
   "version": "0.1.4",
   "minAppVersion": "0.15.0",
-  "description": "Sync your Google Maps saved places from Takeout export to your vault",
+  "description": "Sync your Google Maps saved places from Takeout export to your vault.",
   "author": "MH4GF",
   "authorUrl": "https://github.com/MH4GF",
   "isDesktopOnly": true
