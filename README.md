@@ -5,7 +5,7 @@ Sync your Google Maps saved places from Takeout export to your Obsidian vault.
 ## Features
 
 - Import saved places from Google Takeout export (GeoJSON and CSV)
-- Generate one note per place with coordinates for [Obsidian Bases](https://help.obsidian.md/bases) Map view
+- Generate one note per place with coordinates for [Obsidian Bases](https://help.obsidian.md/bases) Map view (requires [obsidian-maps](https://github.com/obsidianmd/obsidian-maps))
 - Non-destructive sync: existing places are detected by ID and skipped
 
 ## Installation
