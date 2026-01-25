@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { generateNoteContent } from '../generateNoteContent'
+import { buildFrontmatterString, extractBody, generateNoteContent } from '../generateNoteContent'
 import type { Place } from '../types'
 
 /** Replace dynamic last_synced value with placeholder for snapshot testing */
@@ -202,5 +202,100 @@ describe('CSV由来のフィールド対応', () => {
     const content = generateNoteContent(place)
 
     expect(content).toContain('memo: "Line1\\nLine2"')
+  })
+})
+
+describe('extractBody', () => {
+  test('frontmatterありのノートからボディを抽出する', () => {
+    const content = `---
+source: google-maps-takeout
+gmap_id: "test-id"
+---
+
+This is the body content.
+More content here.`
+
+    expect(extractBody(content)).toBe(`This is the body content.
+More content here.`)
+  })
+
+  test('frontmatterのみの場合は空文字を返す', () => {
+    const content = `---
+source: google-maps-takeout
+gmap_id: "test-id"
+---
+`
+
+    expect(extractBody(content)).toBe('')
+  })
+
+  test('frontmatterがない場合はコンテンツ全体を返す', () => {
+    const content = 'This is just plain content without frontmatter.'
+
+    expect(extractBody(content)).toBe(content)
+  })
+
+  test('frontmatter後の先頭空白行を除去する', () => {
+    const content = `---
+gmap_id: "test-id"
+---
+
+
+Body after blank lines.`
+
+    expect(extractBody(content)).toBe('Body after blank lines.')
+  })
+
+  test('frontmatter値に---が含まれる場合も正しく抽出する', () => {
+    const content = `---
+memo: "foo --- bar"
+gmap_id: "test-id"
+---
+
+Body content here.`
+
+    expect(extractBody(content)).toBe('Body content here.')
+  })
+
+  test('frontmatterのみでEOFの場合は空文字を返す', () => {
+    const content = `---
+gmap_id: "test-id"
+---`
+
+    expect(extractBody(content)).toBe('')
+  })
+})
+
+describe('buildFrontmatterString', () => {
+  const basePlace: Place = {
+    id: 'cid-12345678',
+    name: '東京タワー',
+    url: 'https://maps.google.com/?cid=12345678',
+    lat: 35.6586,
+    lng: 139.7454,
+    address: '港区芝公園4-2-8',
+  }
+
+  test('frontmatter文字列を生成する', () => {
+    const frontmatter = buildFrontmatterString(basePlace)
+    const normalized = normalizeSyncedAt(frontmatter)
+
+    expect(normalized).toMatchInlineSnapshot(`
+      "---
+      source: google-maps-takeout
+      gmap_id: "cid-12345678"
+      gmap_url: "https://maps.google.com/?cid=12345678"
+      coordinates: [35.6586, 139.7454]
+      address: "港区芝公園4-2-8"
+      last_synced: "[TIMESTAMP]"
+      ---"
+    `)
+  })
+
+  test('座標がゼロの場合coordinatesを含まない', () => {
+    const place: Place = { ...basePlace, lat: 0, lng: 0 }
+    const frontmatter = buildFrontmatterString(place)
+
+    expect(frontmatter).not.toContain('coordinates:')
   })
 })

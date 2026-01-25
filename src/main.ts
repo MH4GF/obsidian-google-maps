@@ -1,9 +1,9 @@
-import { Notice, Plugin } from 'obsidian'
+import { Notice, Plugin, TFile } from 'obsidian'
 import { DEFAULT_SETTINGS } from './constants'
 import { findNoteByGmapId } from './findNoteByGmapId'
 import { GoogleMapsSyncSettingTab } from './GoogleMapsSyncSettingTab'
 import { generateFileName } from './generateFileName'
-import { generateNoteContent } from './generateNoteContent'
+import { buildFrontmatterString, extractBody, generateNoteContent } from './generateNoteContent'
 import { loadNoteMetadata } from './loadNoteMetadata'
 import { parseCsv } from './parseCsv'
 import { parseGeoJSON } from './parseGeoJSON'
@@ -59,14 +59,31 @@ export default class GoogleMapsSyncPlugin extends Plugin {
       const existingNotes = await loadNoteMetadata(this.app, outputFolder)
 
       let created = 0
-      let skipped = 0
+      let updated = 0
+      let errors = 0
       const createdFileNames: string[] = []
 
       for (const place of places) {
         // Check for duplicate by gmap_id
         const existingNotePath = findNoteByGmapId(existingNotes, place.id, outputFolder)
         if (existingNotePath) {
-          skipped++
+          const existingFile = this.app.vault.getAbstractFileByPath(existingNotePath)
+          if (!(existingFile instanceof TFile)) {
+            console.error('[Google Maps Sync] Expected TFile:', existingNotePath)
+            errors++
+            continue
+          }
+          try {
+            const existingContent = await this.app.vault.read(existingFile)
+            const body = extractBody(existingContent)
+            const newFrontmatter = buildFrontmatterString(place)
+            const newContent = body ? `${newFrontmatter}\n\n${body}` : `${newFrontmatter}\n`
+            await this.app.vault.modify(existingFile, newContent)
+            updated++
+          } catch (e) {
+            console.error('[Google Maps Sync] Failed to update:', existingNotePath, e)
+            errors++
+          }
           continue
         }
 
@@ -82,7 +99,11 @@ export default class GoogleMapsSyncPlugin extends Plugin {
         created++
       }
 
-      new Notice(`Sync complete: ${created} created, ${skipped} skipped`)
+      const parts = [`${created} created`, `${updated} updated`]
+      if (errors > 0) {
+        parts.push(`${errors} errors`)
+      }
+      new Notice(`Sync complete: ${parts.join(', ')}`)
     } catch (error) {
       console.error('Google Maps Sync error:', error)
       new Notice(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)

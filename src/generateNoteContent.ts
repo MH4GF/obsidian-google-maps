@@ -65,3 +65,31 @@ function escapeYamlString(value: string): string {
     .replace(/\t/g, '\\t') // Escape tab
     .replace(/"/g, '\\"') // Escape double quote
 }
+
+/**
+ * Build frontmatter string for updating existing notes
+ */
+export function buildFrontmatterString(place: Place, options: NoteGeneratorOptions = {}): string {
+  const { includeCoordinates = true } = options
+  const now = new Date().toISOString()
+  return buildFrontmatter(place, now, includeCoordinates)
+}
+
+/**
+ * Extract body content from note (everything after frontmatter)
+ */
+export function extractBody(content: string): string {
+  if (!content.startsWith('---')) {
+    return content
+  }
+  const frontmatterEnd = content.indexOf('\n---\n', 3)
+  if (frontmatterEnd === -1) {
+    // Check for frontmatter ending at EOF (no trailing newline after ---)
+    const eofEnd = content.indexOf('\n---', 3)
+    if (eofEnd !== -1 && eofEnd + 4 === content.length) {
+      return ''
+    }
+    return content
+  }
+  return content.slice(frontmatterEnd + 5).trimStart()
+}
