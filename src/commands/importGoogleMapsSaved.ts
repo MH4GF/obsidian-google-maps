@@ -11,6 +11,7 @@ import { parseCsv } from '../parsers/parseCsv'
 import { parseGeoJSON } from '../parsers/parseGeoJSON'
 import type { GoogleMapsImportSettings } from '../settings/types'
 import type { Place } from '../types'
+import { sanitizeTag } from '../utils/sanitizeTag'
 
 export async function importGoogleMapsSaved(
   app: App,
@@ -26,7 +27,7 @@ export async function importGoogleMapsSaved(
     let places: Place[]
     if (file.name.endsWith('.csv')) {
       const listName = file.name.replace(/\.csv$/i, '')
-      const gmapTag = `gmap/${listName}`
+      const gmapTag = `gmap/${sanitizeTag(listName)}`
       places = parseCsv(content).map((p) => ({
         ...p,
         tags: [gmapTag, ...(p.tags ?? [])],

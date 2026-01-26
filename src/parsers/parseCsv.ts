@@ -1,4 +1,5 @@
 import type { Place } from '../types'
+import { sanitizeTag } from '../utils/sanitizeTag'
 import { extractIdFromUrl } from './extractIdFromUrl'
 import { generateHashId } from './generateHashId'
 import type { TakeoutCsvRow } from './types'
@@ -170,6 +171,6 @@ function parseTags(tagsString: string): string[] {
   }
   return tagsString
     .split(',')
-    .map((tag) => tag.trim())
+    .map((tag) => sanitizeTag(tag))
     .filter((tag) => tag !== '')
 }
