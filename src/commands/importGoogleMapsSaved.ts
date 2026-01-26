@@ -6,6 +6,7 @@ import {
   generateNoteContent,
 } from '../import/generateNoteContent'
 import { loadNoteMetadata } from '../import/loadNoteMetadata'
+import { mergePlacesByGmapId } from '../import/mergePlacesByGmapId'
 import { logger } from '../logger'
 import { parseCsv } from '../parsers/parseCsv'
 import { parseGeoJSON } from '../parsers/parseGeoJSON'
@@ -13,31 +14,16 @@ import type { GoogleMapsImportSettings } from '../settings/types'
 import type { Place } from '../types'
 import { sanitizeTag } from '../utils/sanitizeTag'
 
+/** Files to exclude from import (different format, not place data) */
+const EXCLUDED_FILES: readonly string[] = ['クチコミ.json']
+
 export async function importGoogleMapsSaved(
   app: App,
   settings: GoogleMapsImportSettings,
 ): Promise<void> {
   try {
-    const file = await selectDataFile()
-    if (!file) {
-      return
-    }
-
-    const content = await file.text()
-    let places: Place[]
-    if (file.name.endsWith('.csv')) {
-      const listName = file.name.replace(/\.csv$/i, '')
-      const gmapTag = `gmap/${sanitizeTag(listName)}`
-      places = parseCsv(content).map((p) => ({
-        ...p,
-        tags: [gmapTag, ...(p.tags ?? [])],
-      }))
-    } else {
-      places = parseGeoJSON(content)
-    }
-
-    if (places.length === 0) {
-      new Notice('No places found in the file')
+    const files = await selectDataDirectory()
+    if (files.length === 0) {
       return
     }
 
@@ -48,8 +34,44 @@ export async function importGoogleMapsSaved(
       await app.vault.createFolder(outputFolder)
     }
 
+    // Load existing notes once before processing all files
     const existingNotes = await loadNoteMetadata(app, outputFolder)
     const existingFileNames = existingNotes.map((n) => n.path.split('/').pop() ?? '')
+
+    // Aggregate places from all files
+    const allParsedPlaces: Place[] = []
+    let skipped = 0
+
+    for (const file of files) {
+      try {
+        const content = await file.text()
+        let parsedPlaces: Place[]
+
+        if (file.name.endsWith('.csv')) {
+          const listName = file.name.replace(/\.csv$/i, '')
+          const gmapTag = `gmap/${sanitizeTag(listName)}`
+          parsedPlaces = parseCsv(content).map((p) => ({
+            ...p,
+            tags: [gmapTag, ...(p.tags ?? [])],
+          }))
+        } else {
+          parsedPlaces = parseGeoJSON(content)
+        }
+
+        allParsedPlaces.push(...parsedPlaces)
+      } catch (e) {
+        logger.error('Failed to parse file:', file.name, e)
+        skipped++
+      }
+    }
+
+    // Merge places by gmap_id, combining tags for duplicates
+    const places = mergePlacesByGmapId(allParsedPlaces)
+
+    if (places.length === 0) {
+      new Notice('No places found in the selected files')
+      return
+    }
 
     let created = 0
     let updated = 0
@@ -91,7 +113,11 @@ export async function importGoogleMapsSaved(
       created++
     }
 
-    const parts = [`${created} created`, `${updated} updated`]
+    const fileCount = files.length
+    const parts = [`${fileCount} files`, `${created} created`, `${updated} updated`]
+    if (skipped > 0) {
+      parts.push(`${skipped} skipped`)
+    }
     if (errors > 0) {
       parts.push(`${errors} errors`)
     }
@@ -102,19 +128,22 @@ export async function importGoogleMapsSaved(
   }
 }
 
-function selectDataFile(): Promise<File | null> {
+function selectDataDirectory(): Promise<File[]> {
   return new Promise((resolve) => {
     const input = document.createElement('input')
     input.type = 'file'
-    input.accept = '.json,.csv'
+    input.webkitdirectory = true
 
     input.onchange = (): void => {
-      const file = input.files?.[0] ?? null
-      resolve(file)
+      const files = Array.from(input.files ?? []).filter(
+        (f) =>
+          (f.name.endsWith('.csv') || f.name.endsWith('.json')) && !EXCLUDED_FILES.includes(f.name),
+      )
+      resolve(files)
     }
 
     input.oncancel = (): void => {
-      resolve(null)
+      resolve([])
     }
 
     input.click()
