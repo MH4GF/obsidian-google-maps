@@ -21,7 +21,7 @@ export class GoogleMapsImportSettingTab extends PluginSettingTab {
       .addSearch((search) => {
         new FolderSuggest(this.app, search.inputEl)
         search
-          .setPlaceholder('Google Maps/Places')
+          .setPlaceholder('Google Maps/places')
           .setValue(this.plugin.settings.outputFolder)
           .onChange(async (value) => {
             this.plugin.settings.outputFolder = value

@@ -7,6 +7,7 @@ import {
   generateNoteContent,
 } from '../import/generateNoteContent'
 import { loadNoteMetadata } from '../import/loadNoteMetadata'
+import { logger } from '../logger'
 import { parseCsv } from '../parsers/parseCsv'
 import { parseGeoJSON } from '../parsers/parseGeoJSON'
 import type { GoogleMapsImportSettings } from '../settings/types'
@@ -25,14 +26,11 @@ export async function importGoogleMapsSaved(
     const content = await file.text()
     let places: Place[]
     if (file.name.endsWith('.csv')) {
-      console.log('[Google Maps Import] Parsing CSV file:', file.name)
       const listName = file.name.replace(/\.csv$/i, '')
       places = parseCsv(content).map((p) => ({ ...p, list: listName }))
     } else {
-      console.log('[Google Maps Import] Parsing GeoJSON file:', file.name)
       places = parseGeoJSON(content)
     }
-    console.log('[Google Maps Import] Parsed places:', places.length)
 
     if (places.length === 0) {
       new Notice('No places found in the file')
@@ -60,7 +58,7 @@ export async function importGoogleMapsSaved(
       if (existingNotePath) {
         const existingFile = app.vault.getAbstractFileByPath(existingNotePath)
         if (!(existingFile instanceof TFile)) {
-          console.error('[Google Maps Import] Expected TFile:', existingNotePath)
+          logger.error('Expected TFile:', existingNotePath)
           errors++
           continue
         }
@@ -72,7 +70,7 @@ export async function importGoogleMapsSaved(
           await app.vault.modify(existingFile, newContent)
           updated++
         } catch (e) {
-          console.error('[Google Maps Import] Failed to update:', existingNotePath, e)
+          logger.error('Failed to update:', existingNotePath, e)
           errors++
         }
         continue
@@ -96,7 +94,7 @@ export async function importGoogleMapsSaved(
     }
     new Notice(`Import complete: ${parts.join(', ')}`)
   } catch (error) {
-    console.error('Google Maps Import error:', error)
+    logger.error(error)
     new Notice(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }

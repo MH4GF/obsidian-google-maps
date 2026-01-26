@@ -6,6 +6,14 @@
       "correctness": {
         "useImportExtensions": "off"
       },
+      "suspicious": {
+        "noConsole": {
+          "level": "error",
+          "options": {
+            "allow": ["warn", "error", "debug"]
+          }
+        }
+      },
       "style": {
         "noDefaultExport": "off",
         "useFilenamingConvention": {
