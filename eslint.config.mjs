@@ -54,7 +54,7 @@ export default [
       // UI rules
       'obsidianmd/ui/sentence-case': [
         'error',
-        { enforceCamelCaseLower: true, brands: ['Google Maps'] },
+        { enforceCamelCaseLower: true, brands: ['Google Maps', 'Takeout'] },
       ],
     },
   },

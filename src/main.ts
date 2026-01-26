@@ -12,7 +12,7 @@ export default class GoogleMapsImportPlugin extends Plugin {
 
     this.addCommand({
       id: 'import-google-maps-saved',
-      name: 'Import Google Maps saved places',
+      name: 'Import from Takeout',
       callback: () => importGoogleMapsSaved(this.app, this.settings),
     })
 

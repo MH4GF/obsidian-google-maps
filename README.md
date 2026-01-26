@@ -31,7 +31,7 @@ Import your Google Maps saved places from Takeout export to your Obsidian vault.
 ### 2. Run the import command
 
 1. Open Command Palette (Cmd/Ctrl + P)
-2. Run **Import Google Maps saved places**
+2. Run **Google Maps Import: Import from Takeout**
 3. Select the extracted folder (e.g., `~/Downloads/Takeout`)
 4. Notes will be created in your configured output folder
 
