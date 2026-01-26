@@ -1,5 +1,4 @@
 import { type App, Notice, TFile } from 'obsidian'
-import { findNoteByGmapId } from '../import/findNoteByGmapId'
 import { generateFileName } from '../import/generateFileName'
 import {
   buildFrontmatterString,
@@ -27,7 +26,11 @@ export async function importGoogleMapsSaved(
     let places: Place[]
     if (file.name.endsWith('.csv')) {
       const listName = file.name.replace(/\.csv$/i, '')
-      places = parseCsv(content).map((p) => ({ ...p, list: listName }))
+      const gmapTag = `gmap/${listName}`
+      places = parseCsv(content).map((p) => ({
+        ...p,
+        tags: [gmapTag, ...(p.tags ?? [])],
+      }))
     } else {
       places = parseGeoJSON(content)
     }
@@ -44,8 +47,8 @@ export async function importGoogleMapsSaved(
       await app.vault.createFolder(outputFolder)
     }
 
-    // Load existing notes metadata for duplicate checking
     const existingNotes = await loadNoteMetadata(app, outputFolder)
+    const existingFileNames = existingNotes.map((n) => n.path.split('/').pop() ?? '')
 
     let created = 0
     let updated = 0
@@ -53,31 +56,30 @@ export async function importGoogleMapsSaved(
     const createdFileNames: string[] = []
 
     for (const place of places) {
-      // Check for duplicate by gmap_id
-      const existingNotePath = findNoteByGmapId(existingNotes, place.id, outputFolder)
-      if (existingNotePath) {
-        const existingFile = app.vault.getAbstractFileByPath(existingNotePath)
+      const existingNote = existingNotes.find((n) => n.gmapId === place.id)
+      if (existingNote) {
+        const existingFile = app.vault.getAbstractFileByPath(existingNote.path)
         if (!(existingFile instanceof TFile)) {
-          logger.error('Expected TFile:', existingNotePath)
+          logger.error('Expected TFile:', existingNote.path)
           errors++
           continue
         }
         try {
           const existingContent = await app.vault.read(existingFile)
           const body = extractBody(existingContent)
-          const newFrontmatter = buildFrontmatterString(place)
+          const newFrontmatter = buildFrontmatterString(place, {
+            existingTags: existingNote.tags ?? [],
+          })
           const newContent = body ? `${newFrontmatter}\n\n${body}` : `${newFrontmatter}\n`
           await app.vault.modify(existingFile, newContent)
           updated++
         } catch (e) {
-          logger.error('Failed to update:', existingNotePath, e)
+          logger.error('Failed to update:', existingNote.path, e)
           errors++
         }
         continue
       }
 
-      // Combine existing files in folder with files created in this batch
-      const existingFileNames = existingNotes.map((n) => n.path.split('/').pop() ?? '')
       const allFileNames = [...existingFileNames, ...createdFileNames]
       const fileName = generateFileName(place, allFileNames)
       const filePath = `${outputFolder}/${fileName}`

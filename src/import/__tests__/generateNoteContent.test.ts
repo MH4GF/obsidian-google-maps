@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'vitest'
 import type { Place } from '../../types'
-import { buildFrontmatterString, extractBody, generateNoteContent } from '../generateNoteContent'
+import {
+  buildFrontmatterString,
+  buildTagsArray,
+  extractBody,
+  generateNoteContent,
+} from '../generateNoteContent'
 
 /** Replace dynamic last_imported_at value with placeholder for snapshot testing */
 function normalizeImportedAt(content: string): string {
@@ -78,24 +83,24 @@ describe('generateNoteContent', () => {
     `)
   })
 
-  test('listがある場合frontmatterに含まれる', () => {
-    const placeWithList: Place = {
+  test('tagsがある場合frontmatterに含まれる', () => {
+    const placeWithTags: Place = {
       id: 'test-id',
       name: 'テスト場所',
       lat: 35.0,
       lng: 139.0,
-      list: 'お気に入り',
+      tags: ['gmap/お気に入り'],
     }
 
-    const content = generateNoteContent(placeWithList)
+    const content = generateNoteContent(placeWithTags)
     const normalized = normalizeImportedAt(content)
 
     expect(normalized).toMatchInlineSnapshot(`
       "---
       source: google-maps-takeout
       gmap_id: "test-id"
-      list: "お気に入り"
       coordinates: [35, 139]
+      tags: ["gmap/お気に入り"]
       last_imported_at: "[TIMESTAMP]"
       ---
       "
@@ -179,7 +184,7 @@ describe('CSV由来のフィールド対応', () => {
       lat: 0,
       lng: 0,
       memo: 'これはメモです',
-      tags: 'カフェ',
+      tags: ['カフェ'],
       comment: 'コメント内容',
     }
 
@@ -330,5 +335,70 @@ describe('buildFrontmatterString', () => {
     const frontmatter = buildFrontmatterString(place)
 
     expect(frontmatter).not.toContain('coordinates:')
+  })
+})
+
+describe('buildTagsArray', () => {
+  test('新規タグのみの場合はそのまま返す', () => {
+    const placeTags = ['gmap/お気に入り', 'カフェ']
+    const existingTags: string[] = []
+
+    expect(buildTagsArray(placeTags, existingTags)).toEqual(['gmap/お気に入り', 'カフェ'])
+  })
+
+  test('既存のgmap/タグと新規gmap/タグをマージする', () => {
+    const placeTags = ['gmap/行きたい']
+    const existingTags = ['gmap/お気に入り']
+
+    expect(buildTagsArray(placeTags, existingTags)).toEqual(['gmap/お気に入り', 'gmap/行きたい'])
+  })
+
+  test('ユーザー手動タグを保持する', () => {
+    const placeTags = ['gmap/お気に入り']
+    const existingTags = ['visited', 'tokyo']
+
+    expect(buildTagsArray(placeTags, existingTags)).toEqual(['gmap/お気に入り', 'tokyo', 'visited'])
+  })
+
+  test('重複タグを排除する', () => {
+    const placeTags = ['gmap/お気に入り', 'カフェ']
+    const existingTags = ['gmap/お気に入り', 'カフェ']
+
+    expect(buildTagsArray(placeTags, existingTags)).toEqual(['gmap/お気に入り', 'カフェ'])
+  })
+
+  test('gmap/タグが先頭に来る', () => {
+    const placeTags = ['カフェ', 'gmap/お気に入り']
+    const existingTags = ['ランチ']
+
+    // gmap/タグが先頭、ユーザータグはソート順
+    expect(buildTagsArray(placeTags, existingTags)).toEqual(['gmap/お気に入り', 'カフェ', 'ランチ'])
+  })
+
+  test('空配列を渡すと空配列を返す', () => {
+    expect(buildTagsArray([], [])).toEqual([])
+  })
+
+  test('空文字タグをフィルタする', () => {
+    const placeTags = ['gmap/お気に入り', '', 'カフェ']
+    const existingTags = ['', 'visited']
+
+    expect(buildTagsArray(placeTags, existingTags)).toEqual([
+      'gmap/お気に入り',
+      'visited',
+      'カフェ',
+    ])
+  })
+
+  test('複数リストへの所属（別CSVから再インポート）', () => {
+    const placeTags = ['gmap/行きたい', 'ディナー']
+    const existingTags = ['gmap/お気に入り', 'カフェ']
+
+    expect(buildTagsArray(placeTags, existingTags)).toEqual([
+      'gmap/お気に入り',
+      'gmap/行きたい',
+      'カフェ',
+      'ディナー',
+    ])
   })
 })

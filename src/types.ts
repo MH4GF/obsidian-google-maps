@@ -9,7 +9,6 @@ export type Place = {
   lng: number
   address?: string
   memo?: string
-  tags?: string
+  tags?: string[]
   comment?: string
-  list?: string
 }

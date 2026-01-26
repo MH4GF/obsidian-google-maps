@@ -1,71 +1,92 @@
 import type { App } from 'obsidian'
 import type { NoteMetadata } from './types'
 
-/**
- * 指定フォルダ内の全ノートからfrontmatterのgmap_idを読み込んでNoteMetadataの配列を返す
- */
 export async function loadNoteMetadata(app: App, folderPrefix: string): Promise<NoteMetadata[]> {
   const markdownFiles = app.vault.getMarkdownFiles()
   const metadata: NoteMetadata[] = []
 
   for (const file of markdownFiles) {
-    // 指定フォルダ内のファイルのみ処理
     if (!file.path.startsWith(folderPrefix)) {
       continue
     }
 
-    // metadataCacheからfrontmatterを取得
     let gmapId: string | undefined
+    let tags: string[] | undefined
     const cache = app.metadataCache.getFileCache(file)
 
     if (cache?.frontmatter) {
-      // frontmatterからgmap_idを取得（文字列のクォートを除去）
-      const rawGmapId = cache.frontmatter['gmap_id'] as string | undefined
-      if (typeof rawGmapId === 'string') {
-        // YAMLの値からクォートを除去（"cid-123" -> cid-123）
-        gmapId = rawGmapId.replace(/^["']|["']$/g, '')
-      }
+      gmapId = extractGmapIdFromFrontmatter(cache.frontmatter['gmap_id'])
+      tags = extractTagsFromFrontmatter(cache.frontmatter['tags'])
     }
 
-    // frontmatterにない場合はファイルコンテンツから直接抽出を試みる
-    if (!gmapId) {
+    if (!gmapId || !tags) {
       try {
         const fileContent = await app.vault.read(file)
-        gmapId = extractGmapIdFromContent(fileContent)
+        if (!gmapId) {
+          gmapId = extractGmapIdFromContent(fileContent)
+        }
+        if (!tags) {
+          tags = extractTagsFromContent(fileContent)
+        }
       } catch {
-        // ファイル読み込みエラーは無視
+        // File read errors are silently ignored
       }
     }
 
     metadata.push({
       path: file.path,
       gmapId,
+      ...(tags && { tags }),
     })
   }
 
   return metadata
 }
 
-/**
- * ファイルコンテンツからgmap_idを抽出
- */
+function extractGmapIdFromFrontmatter(rawGmapId: unknown): string | undefined {
+  if (typeof rawGmapId !== 'string') {
+    return undefined
+  }
+  return rawGmapId.replace(/^["']|["']$/g, '')
+}
+
+function extractTagsFromFrontmatter(rawTags: unknown): string[] | undefined {
+  if (Array.isArray(rawTags)) {
+    return rawTags.filter((t): t is string => typeof t === 'string')
+  }
+  if (typeof rawTags === 'string' && rawTags !== '') {
+    return [rawTags]
+  }
+  return undefined
+}
+
 function extractGmapIdFromContent(content: string): string | undefined {
-  // frontmatterブロックを抽出
   const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/)
-  if (!frontmatterMatch) {
+  if (!frontmatterMatch?.[1]) {
     return undefined
   }
 
-  const frontmatter = frontmatterMatch[1]
-  if (!frontmatter) {
+  const gmapIdMatch = frontmatterMatch[1].match(/^gmap_id:\s*(?:"([^"]+)"|'([^']+)'|(\S+))$/m)
+  return gmapIdMatch?.[1] ?? gmapIdMatch?.[2] ?? gmapIdMatch?.[3]
+}
+
+function extractTagsFromContent(content: string): string[] | undefined {
+  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/)
+  if (!frontmatterMatch?.[1]) {
     return undefined
   }
 
-  // gmap_id: "cid-123" または gmap_id: 'cid-123' または gmap_id: cid-123 を検索
-  const gmapIdMatch = frontmatter.match(/^gmap_id:\s*(?:"([^"]+)"|'([^']+)'|(\S+))$/m)
-  if (gmapIdMatch) {
-    // クォートされた値またはクォートなしの値を取得
-    return gmapIdMatch[1] || gmapIdMatch[2] || gmapIdMatch[3]
+  // tags: ["tag1", "tag2"] 形式
+  const arrayMatch = frontmatterMatch[1].match(/^tags:\s*\[(.*)\]$/m)
+  if (arrayMatch?.[1]) {
+    const tags = arrayMatch[1].match(/"([^"]+)"|'([^']+)'/g)
+    return tags?.map((t) => t.slice(1, -1)) ?? []
+  }
+
+  // tags: tag1 形式（単一文字列）
+  const stringMatch = frontmatterMatch[1].match(/^tags:\s*(\S+)$/m)
+  if (stringMatch?.[1] && !stringMatch[1].startsWith('[')) {
+    return [stringMatch[1]]
   }
 
   return undefined

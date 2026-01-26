@@ -1,33 +1,25 @@
 import type { Place } from '../types'
 import type { NoteGeneratorOptions } from './types'
 
-/**
- * Generate Markdown note content from Place
- */
 export function generateNoteContent(place: Place, options: NoteGeneratorOptions = {}): string {
-  const { includeCoordinates = true } = options
-  const now = new Date().toISOString()
-
-  const frontmatter = buildFrontmatter(place, now, includeCoordinates)
-
-  return `${frontmatter}\n`
+  return `${buildFrontmatterString(place, options)}\n`
 }
 
-function buildFrontmatter(place: Place, importedAt: string, includeCoordinates: boolean): string {
+function buildFrontmatter(
+  place: Place,
+  importedAt: string,
+  includeCoordinates: boolean,
+  existingTags: string[],
+): string {
   const lines: string[] = ['---']
 
   lines.push('source: google-maps-takeout')
   lines.push(`gmap_id: "${place.id}"`)
 
-  if (place.list) {
-    lines.push(`list: "${escapeYamlString(place.list)}"`)
-  }
-
   if (place.url) {
     lines.push(`gmap_url: "${place.url}"`)
   }
 
-  // Only include coordinates if we have valid ones
   if (includeCoordinates && place.lat !== 0 && place.lng !== 0) {
     lines.push(`coordinates: [${place.lat}, ${place.lng}]`)
   }
@@ -36,8 +28,10 @@ function buildFrontmatter(place: Place, importedAt: string, includeCoordinates: 
     lines.push(`address: "${escapeYamlString(place.address)}"`)
   }
 
-  if (place.tags) {
-    lines.push(`tags: ["${escapeYamlString(place.tags)}"]`)
+  const mergedTags = buildTagsArray(place.tags ?? [], existingTags)
+  if (mergedTags.length > 0) {
+    const tagsStr = mergedTags.map((t) => `"${escapeYamlString(t)}"`).join(', ')
+    lines.push(`tags: [${tagsStr}]`)
   }
 
   if (place.memo) {
@@ -54,43 +48,40 @@ function buildFrontmatter(place: Place, importedAt: string, includeCoordinates: 
   return lines.join('\n')
 }
 
-/**
- * Escape special characters in YAML string values
- * Order matters: backslash must be escaped first to avoid double-escaping
- */
+export function buildTagsArray(placeTags: string[], existingTags: string[]): string[] {
+  const gmapTags = new Set<string>()
+  const userTags = new Set<string>()
+
+  for (const tag of [...existingTags, ...placeTags].filter((t) => t !== '')) {
+    if (tag.startsWith('gmap/')) {
+      gmapTags.add(tag)
+    } else {
+      userTags.add(tag)
+    }
+  }
+
+  return [...Array.from(gmapTags).sort(), ...Array.from(userTags).sort()]
+}
+
 function escapeYamlString(value: string): string {
   return value
-    .replace(/\\/g, '\\\\') // Escape backslash first
-    .replace(/\n/g, '\\n') // Escape newline (LF)
-    .replace(/\r/g, '\\r') // Escape carriage return (CR)
-    .replace(/\t/g, '\\t') // Escape tab
-    .replace(/"/g, '\\"') // Escape double quote
+    .replace(/\\/g, '\\\\')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t')
+    .replace(/"/g, '\\"')
 }
 
-/**
- * Build frontmatter string for updating existing notes
- */
 export function buildFrontmatterString(place: Place, options: NoteGeneratorOptions = {}): string {
-  const { includeCoordinates = true } = options
+  const { includeCoordinates = true, existingTags = [] } = options
   const now = new Date().toISOString()
-  return buildFrontmatter(place, now, includeCoordinates)
+  return buildFrontmatter(place, now, includeCoordinates, existingTags)
 }
 
-/**
- * Extract body content from note (everything after frontmatter)
- */
 export function extractBody(content: string): string {
-  if (!content.startsWith('---')) {
+  const match = content.match(/^---\n[\s\S]*?\n---\n?/)
+  if (!match) {
     return content
   }
-  const frontmatterEnd = content.indexOf('\n---\n', 3)
-  if (frontmatterEnd === -1) {
-    // Check for frontmatter ending at EOF (no trailing newline after ---)
-    const eofEnd = content.indexOf('\n---', 3)
-    if (eofEnd !== -1 && eofEnd + 4 === content.length) {
-      return ''
-    }
-    return content
-  }
-  return content.slice(frontmatterEnd + 5).trimStart()
+  return content.slice(match[0].length).trimStart()
 }

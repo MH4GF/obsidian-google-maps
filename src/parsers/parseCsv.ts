@@ -147,6 +147,7 @@ function parseFields(line: string): string[] {
  */
 function rowToPlace(row: TakeoutCsvRow): Place {
   const id = extractIdFromUrl(row.url) ?? generateHashId(row.title, '')
+  const tags = parseTags(row.tags)
 
   return {
     id,
@@ -155,7 +156,20 @@ function rowToPlace(row: TakeoutCsvRow): Place {
     lat: 0,
     lng: 0,
     ...(row.memo && { memo: row.memo }),
-    ...(row.tags && { tags: row.tags }),
+    ...(tags.length > 0 && { tags }),
     ...(row.comment && { comment: row.comment }),
   }
+}
+
+/**
+ * Parse comma-separated tags string into array
+ */
+function parseTags(tagsString: string): string[] {
+  if (!tagsString) {
+    return []
+  }
+  return tagsString
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter((tag) => tag !== '')
 }

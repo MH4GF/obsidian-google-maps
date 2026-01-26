@@ -11,7 +11,7 @@ describe('parseCsv', () => {
     expect(places).toHaveLength(1)
     expect(places[0]?.name).toBe('ジャズ喫茶 LUSH LIFE')
     expect(places[0]?.memo).toBe('素敵な雰囲気')
-    expect(places[0]?.tags).toBe('カフェ')
+    expect(places[0]?.tags).toEqual(['カフェ'])
     expect(places[0]?.comment).toBe('お気に入り')
   })
 
@@ -224,5 +224,35 @@ describe('parseCsv', () => {
     expect(places).toHaveLength(2)
     expect(places[0]?.name).toBe('場所A')
     expect(places[1]?.name).toBe('場所B')
+  })
+
+  test('タグ列がカンマ区切りの場合、配列に分割する', () => {
+    const csv = `タイトル,メモ,URL,タグ,コメント
+場所A,,https://example.com,"カフェ, ランチ",`
+
+    const places = parseCsv(csv)
+
+    expect(places).toHaveLength(1)
+    expect(places[0]?.tags).toEqual(['カフェ', 'ランチ'])
+  })
+
+  test('タグ列に空白のみのタグがある場合は除外する', () => {
+    const csv = `タイトル,メモ,URL,タグ,コメント
+場所A,,https://example.com,"カフェ,  , ランチ",`
+
+    const places = parseCsv(csv)
+
+    expect(places).toHaveLength(1)
+    expect(places[0]?.tags).toEqual(['カフェ', 'ランチ'])
+  })
+
+  test('タグ列が単一タグの場合、1要素の配列になる', () => {
+    const csv = `タイトル,メモ,URL,タグ,コメント
+場所A,,https://example.com,カフェ,`
+
+    const places = parseCsv(csv)
+
+    expect(places).toHaveLength(1)
+    expect(places[0]?.tags).toEqual(['カフェ'])
   })
 })

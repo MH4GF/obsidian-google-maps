@@ -49,9 +49,12 @@ gmap_id: "cid-12345678"
 gmap_url: "https://maps.google.com/?cid=12345678"
 coordinates: [35.6586, 139.7454]
 address: "Shibakoen 4-2-8, Minato-ku"
+tags: ["gmap/Favourites", "cafe"]
 last_imported_at: "2024-01-15T12:00:00.000Z"
 ---
 ```
+
+**Tags**: When importing from CSV, the list name (from the filename) is added as a `gmap/` prefixed tag. For example, importing `Favourites.csv` adds the tag `gmap/Favourites`. If the CSV contains a tags column, those are also included. Re-importing the same place from a different list will merge the tags.
 
 **Note**: CSV files do not include coordinates. Use GeoJSON for Map view.
 

@@ -68,7 +68,8 @@ bun run test:watch # Watch mode for tests
 ## Note format
 
 Generated place notes include:
-- **Frontmatter only**: `coordinates: [lat, lng]`, `gmap_url`, `address`, `last_imported_at`
+- **Frontmatter only**: `coordinates: [lat, lng]`, `gmap_url`, `address`, `tags`, `last_imported_at`
+- **Tags**: `gmap/` prefixed tags from CSV list names (e.g., `gmap/Favourites`), plus any CSV tags column values. Re-importing merges tags without duplication. User-added tags are preserved.
 - Body is empty, allowing users to freely add their own content
 
 ## Manifest rules (`manifest.json`)
