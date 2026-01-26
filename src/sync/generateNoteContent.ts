@@ -1,4 +1,5 @@
-import type { NoteGeneratorOptions, Place } from './types'
+import type { Place } from '../types'
+import type { NoteGeneratorOptions } from './types'
 
 /**
  * Generate Markdown note content from Place

@@ -1,7 +1,8 @@
+import type { Place } from '../types'
 import { extractCoordsFromUrl } from './extractCoordsFromUrl'
 import { extractIdFromUrl } from './extractIdFromUrl'
 import { generateHashId } from './generateHashId'
-import type { Place, TakeoutFeature, TakeoutGeoJSON } from './types'
+import type { TakeoutFeature, TakeoutGeoJSON } from './types'
 
 /**
  * Parse Google Takeout GeoJSON (保存した場所.json) into Place array

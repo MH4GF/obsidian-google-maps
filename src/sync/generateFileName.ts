@@ -1,4 +1,4 @@
-import type { Place } from './types'
+import type { Place } from '../types'
 
 /**
  * Generate safe filename from place name

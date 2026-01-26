@@ -1,6 +1,7 @@
+import type { Place } from '../types'
 import { extractIdFromUrl } from './extractIdFromUrl'
 import { generateHashId } from './generateHashId'
-import type { Place, TakeoutCsvRow } from './types'
+import type { TakeoutCsvRow } from './types'
 
 /**
  * Parse Google Takeout CSV (保存済み/*.csv) into Place array

@@ -24,8 +24,8 @@
         "**/__tests__/**",
         "version-bump.mjs",
         "src/main.ts",
-        "src/types.ts",
-        "src/constants.ts"
+        "**/types.ts",
+        "**/constants.ts"
       ],
       "linter": {
         "rules": {

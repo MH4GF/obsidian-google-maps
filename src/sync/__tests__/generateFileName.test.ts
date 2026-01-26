@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
+import type { Place } from '../../types'
 import { generateFileName } from '../generateFileName'
-import type { Place } from '../types'
 
 describe('generateFileName', () => {
   test('ファイル名は{Place Name}.md形式', () => {

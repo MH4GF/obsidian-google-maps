@@ -1,6 +1,6 @@
 import { type App, PluginSettingTab, Setting } from 'obsidian'
+import type GoogleMapsSyncPlugin from '../main'
 import { FolderSuggest } from './FolderSuggest'
-import type GoogleMapsSyncPlugin from './main'
 
 export class GoogleMapsSyncSettingTab extends PluginSettingTab {
   plugin: GoogleMapsSyncPlugin

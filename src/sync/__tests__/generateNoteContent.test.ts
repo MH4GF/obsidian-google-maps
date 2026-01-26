@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
+import type { Place } from '../../types'
 import { buildFrontmatterString, extractBody, generateNoteContent } from '../generateNoteContent'
-import type { Place } from '../types'
 
 /** Replace dynamic last_synced value with placeholder for snapshot testing */
 function normalizeSyncedAt(content: string): string {
