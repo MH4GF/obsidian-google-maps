@@ -13,7 +13,7 @@ export function generateNoteContent(place: Place, options: NoteGeneratorOptions 
   return `${frontmatter}\n`
 }
 
-function buildFrontmatter(place: Place, syncedAt: string, includeCoordinates: boolean): string {
+function buildFrontmatter(place: Place, importedAt: string, includeCoordinates: boolean): string {
   const lines: string[] = ['---']
 
   lines.push('source: google-maps-takeout')
@@ -48,7 +48,7 @@ function buildFrontmatter(place: Place, syncedAt: string, includeCoordinates: bo
     lines.push(`comment: "${escapeYamlString(place.comment)}"`)
   }
 
-  lines.push(`last_synced: "${syncedAt}"`)
+  lines.push(`last_imported_at: "${importedAt}"`)
   lines.push('---')
 
   return lines.join('\n')

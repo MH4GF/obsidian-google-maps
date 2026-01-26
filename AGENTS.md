@@ -1,6 +1,6 @@
-# Google Maps Sync - Obsidian Plugin
+# Google Maps Import - Obsidian Plugin
 
-Syncs Google Maps saved places from Takeout export to vault notes. Generates one markdown note per place with coordinates for Obsidian Bases Map view.
+Imports Google Maps saved places from Takeout export to vault notes. Generates one markdown note per place with coordinates for Obsidian Bases Map view.
 
 ## Project overview
 
@@ -68,7 +68,7 @@ bun run test:watch # Watch mode for tests
 ## Note format
 
 Generated place notes include:
-- **Frontmatter only**: `coordinates: [lat, lng]`, `gmap_url`, `address`, `last_synced`
+- **Frontmatter only**: `coordinates: [lat, lng]`, `gmap_url`, `address`, `last_imported_at`
 - Body is empty, allowing users to freely add their own content
 
 ## Manifest rules (`manifest.json`)

@@ -1,20 +1,20 @@
 import { type App, Notice, TFile } from 'obsidian'
-import { parseCsv } from '../parsers/parseCsv'
-import { parseGeoJSON } from '../parsers/parseGeoJSON'
-import type { GoogleMapsSyncSettings } from '../settings/types'
-import { findNoteByGmapId } from '../sync/findNoteByGmapId'
-import { generateFileName } from '../sync/generateFileName'
+import { findNoteByGmapId } from '../import/findNoteByGmapId'
+import { generateFileName } from '../import/generateFileName'
 import {
   buildFrontmatterString,
   extractBody,
   generateNoteContent,
-} from '../sync/generateNoteContent'
-import { loadNoteMetadata } from '../sync/loadNoteMetadata'
+} from '../import/generateNoteContent'
+import { loadNoteMetadata } from '../import/loadNoteMetadata'
+import { parseCsv } from '../parsers/parseCsv'
+import { parseGeoJSON } from '../parsers/parseGeoJSON'
+import type { GoogleMapsImportSettings } from '../settings/types'
 import type { Place } from '../types'
 
-export async function syncGoogleMapsSaved(
+export async function importGoogleMapsSaved(
   app: App,
-  settings: GoogleMapsSyncSettings,
+  settings: GoogleMapsImportSettings,
 ): Promise<void> {
   try {
     const file = await selectDataFile()
@@ -25,14 +25,14 @@ export async function syncGoogleMapsSaved(
     const content = await file.text()
     let places: Place[]
     if (file.name.endsWith('.csv')) {
-      console.log('[Google Maps Sync] Parsing CSV file:', file.name)
+      console.log('[Google Maps Import] Parsing CSV file:', file.name)
       const listName = file.name.replace(/\.csv$/i, '')
       places = parseCsv(content).map((p) => ({ ...p, list: listName }))
     } else {
-      console.log('[Google Maps Sync] Parsing GeoJSON file:', file.name)
+      console.log('[Google Maps Import] Parsing GeoJSON file:', file.name)
       places = parseGeoJSON(content)
     }
-    console.log('[Google Maps Sync] Parsed places:', places.length)
+    console.log('[Google Maps Import] Parsed places:', places.length)
 
     if (places.length === 0) {
       new Notice('No places found in the file')
@@ -60,7 +60,7 @@ export async function syncGoogleMapsSaved(
       if (existingNotePath) {
         const existingFile = app.vault.getAbstractFileByPath(existingNotePath)
         if (!(existingFile instanceof TFile)) {
-          console.error('[Google Maps Sync] Expected TFile:', existingNotePath)
+          console.error('[Google Maps Import] Expected TFile:', existingNotePath)
           errors++
           continue
         }
@@ -72,7 +72,7 @@ export async function syncGoogleMapsSaved(
           await app.vault.modify(existingFile, newContent)
           updated++
         } catch (e) {
-          console.error('[Google Maps Sync] Failed to update:', existingNotePath, e)
+          console.error('[Google Maps Import] Failed to update:', existingNotePath, e)
           errors++
         }
         continue
@@ -94,9 +94,9 @@ export async function syncGoogleMapsSaved(
     if (errors > 0) {
       parts.push(`${errors} errors`)
     }
-    new Notice(`Sync complete: ${parts.join(', ')}`)
+    new Notice(`Import complete: ${parts.join(', ')}`)
   } catch (error) {
-    console.error('Google Maps Sync error:', error)
+    console.error('Google Maps Import error:', error)
     new Notice(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }

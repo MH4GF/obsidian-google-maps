@@ -2,9 +2,9 @@ import { describe, expect, test } from 'vitest'
 import type { Place } from '../../types'
 import { buildFrontmatterString, extractBody, generateNoteContent } from '../generateNoteContent'
 
-/** Replace dynamic last_synced value with placeholder for snapshot testing */
-function normalizeSyncedAt(content: string): string {
-  return content.replace(/last_synced: "[^"]+"/g, 'last_synced: "[TIMESTAMP]"')
+/** Replace dynamic last_imported_at value with placeholder for snapshot testing */
+function normalizeImportedAt(content: string): string {
+  return content.replace(/last_imported_at: "[^"]+"/g, 'last_imported_at: "[TIMESTAMP]"')
 }
 
 describe('generateNoteContent', () => {
@@ -19,7 +19,7 @@ describe('generateNoteContent', () => {
 
   test('完全なノートコンテンツを生成する', () => {
     const content = generateNoteContent(basePlace)
-    const normalized = normalizeSyncedAt(content)
+    const normalized = normalizeImportedAt(content)
 
     expect(normalized).toMatchInlineSnapshot(`
       "---
@@ -28,7 +28,7 @@ describe('generateNoteContent', () => {
       gmap_url: "https://maps.google.com/?cid=12345678"
       coordinates: [35.6586, 139.7454]
       address: "港区芝公園4-2-8"
-      last_synced: "[TIMESTAMP]"
+      last_imported_at: "[TIMESTAMP]"
       ---
       "
     `)
@@ -42,7 +42,7 @@ describe('generateNoteContent', () => {
     }
 
     const content = generateNoteContent(placeWithoutCoords)
-    const normalized = normalizeSyncedAt(content)
+    const normalized = normalizeImportedAt(content)
 
     expect(normalized).toMatchInlineSnapshot(`
       "---
@@ -50,7 +50,7 @@ describe('generateNoteContent', () => {
       gmap_id: "cid-12345678"
       gmap_url: "https://maps.google.com/?cid=12345678"
       address: "港区芝公園4-2-8"
-      last_synced: "[TIMESTAMP]"
+      last_imported_at: "[TIMESTAMP]"
       ---
       "
     `)
@@ -65,14 +65,14 @@ describe('generateNoteContent', () => {
     }
 
     const content = generateNoteContent(minimalPlace)
-    const normalized = normalizeSyncedAt(content)
+    const normalized = normalizeImportedAt(content)
 
     expect(normalized).toMatchInlineSnapshot(`
       "---
       source: google-maps-takeout
       gmap_id: "hash-abc123"
       coordinates: [35, 139]
-      last_synced: "[TIMESTAMP]"
+      last_imported_at: "[TIMESTAMP]"
       ---
       "
     `)
@@ -88,7 +88,7 @@ describe('generateNoteContent', () => {
     }
 
     const content = generateNoteContent(placeWithList)
-    const normalized = normalizeSyncedAt(content)
+    const normalized = normalizeImportedAt(content)
 
     expect(normalized).toMatchInlineSnapshot(`
       "---
@@ -96,7 +96,7 @@ describe('generateNoteContent', () => {
       gmap_id: "test-id"
       list: "お気に入り"
       coordinates: [35, 139]
-      last_synced: "[TIMESTAMP]"
+      last_imported_at: "[TIMESTAMP]"
       ---
       "
     `)
@@ -116,7 +116,7 @@ describe('escapeYamlString - YAML特殊文字のエスケープ', () => {
     test('バックスラッシュは二重にエスケープされる', () => {
       const place = basePlaceWithAddress('C:\\Users\\test')
       const content = generateNoteContent(place)
-      const normalized = normalizeSyncedAt(content)
+      const normalized = normalizeImportedAt(content)
 
       expect(normalized).toContain('address: "C:\\\\Users\\\\test"')
     })
@@ -126,7 +126,7 @@ describe('escapeYamlString - YAML特殊文字のエスケープ', () => {
     test('ダブルクォートはバックスラッシュでエスケープされる', () => {
       const place = basePlaceWithAddress('He said "Hello"')
       const content = generateNoteContent(place)
-      const normalized = normalizeSyncedAt(content)
+      const normalized = normalizeImportedAt(content)
 
       expect(normalized).toContain('address: "He said \\"Hello\\""')
     })
@@ -136,7 +136,7 @@ describe('escapeYamlString - YAML特殊文字のエスケープ', () => {
     test('改行(LF)はエスケープシーケンスに変換される', () => {
       const place = basePlaceWithAddress('Line1\nLine2')
       const content = generateNoteContent(place)
-      const normalized = normalizeSyncedAt(content)
+      const normalized = normalizeImportedAt(content)
 
       expect(normalized).toContain('address: "Line1\\nLine2"')
     })
@@ -144,7 +144,7 @@ describe('escapeYamlString - YAML特殊文字のエスケープ', () => {
     test('キャリッジリターン(CR)はエスケープシーケンスに変換される', () => {
       const place = basePlaceWithAddress('Line1\rLine2')
       const content = generateNoteContent(place)
-      const normalized = normalizeSyncedAt(content)
+      const normalized = normalizeImportedAt(content)
 
       expect(normalized).toContain('address: "Line1\\rLine2"')
     })
@@ -154,7 +154,7 @@ describe('escapeYamlString - YAML特殊文字のエスケープ', () => {
     test('タブ文字はエスケープシーケンスに変換される', () => {
       const place = basePlaceWithAddress('Col1\tCol2')
       const content = generateNoteContent(place)
-      const normalized = normalizeSyncedAt(content)
+      const normalized = normalizeImportedAt(content)
 
       expect(normalized).toContain('address: "Col1\\tCol2"')
     })
@@ -164,7 +164,7 @@ describe('escapeYamlString - YAML特殊文字のエスケープ', () => {
     test('複数の特殊文字が混在する場合、全てエスケープされる', () => {
       const place = basePlaceWithAddress('Path: C:\\test\nNote: "important"')
       const content = generateNoteContent(place)
-      const normalized = normalizeSyncedAt(content)
+      const normalized = normalizeImportedAt(content)
 
       expect(normalized).toContain('address: "Path: C:\\\\test\\nNote: \\"important\\""')
     })
@@ -184,7 +184,7 @@ describe('CSV由来のフィールド対応', () => {
     }
 
     const content = generateNoteContent(place)
-    const normalized = normalizeSyncedAt(content)
+    const normalized = normalizeImportedAt(content)
 
     expect(normalized).toMatchInlineSnapshot(`
       "---
@@ -193,7 +193,7 @@ describe('CSV由来のフィールド対応', () => {
       tags: ["カフェ"]
       memo: "これはメモです"
       comment: "コメント内容"
-      last_synced: "[TIMESTAMP]"
+      last_imported_at: "[TIMESTAMP]"
       ---
       "
     `)
@@ -311,7 +311,7 @@ describe('buildFrontmatterString', () => {
 
   test('frontmatter文字列を生成する', () => {
     const frontmatter = buildFrontmatterString(basePlace)
-    const normalized = normalizeSyncedAt(frontmatter)
+    const normalized = normalizeImportedAt(frontmatter)
 
     expect(normalized).toMatchInlineSnapshot(`
       "---
@@ -320,7 +320,7 @@ describe('buildFrontmatterString', () => {
       gmap_url: "https://maps.google.com/?cid=12345678"
       coordinates: [35.6586, 139.7454]
       address: "港区芝公園4-2-8"
-      last_synced: "[TIMESTAMP]"
+      last_imported_at: "[TIMESTAMP]"
       ---"
     `)
   })

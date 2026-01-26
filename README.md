@@ -1,12 +1,12 @@
-# Google Maps Sync
+# Google Maps Import
 
-Sync your Google Maps saved places from Takeout export to your Obsidian vault.
+Import your Google Maps saved places from Takeout export to your Obsidian vault.
 
 ## Features
 
 - Import saved places from Google Takeout export (GeoJSON and CSV)
 - Generate one note per place with coordinates for [Obsidian Bases](https://help.obsidian.md/bases) Map view (requires [obsidian-maps](https://github.com/obsidianmd/obsidian-maps))
-- Non-destructive sync: existing places are detected by ID and skipped
+- Non-destructive import: existing places are detected by ID and skipped
 
 ## Installation
 
@@ -25,10 +25,10 @@ Sync your Google Maps saved places from Takeout export to your Obsidian vault.
    - **GeoJSON**: `Saved Places.json` (includes coordinates)
    - **CSV**: Files in the lists folder, e.g., `Favourites.csv` (no coordinates)
 
-### 2. Run the sync command
+### 2. Run the import command
 
 1. Open Command Palette (Cmd/Ctrl + P)
-2. Run **Sync Google Maps Saved**
+2. Run **Import Google Maps saved places**
 3. Select a `.json` or `.csv` file
 4. Notes will be created in your configured output folder
 
@@ -49,7 +49,7 @@ gmap_id: "cid-12345678"
 gmap_url: "https://maps.google.com/?cid=12345678"
 coordinates: [35.6586, 139.7454]
 address: "Shibakoen 4-2-8, Minato-ku"
-last_synced: "2024-01-15T12:00:00.000Z"
+last_imported_at: "2024-01-15T12:00:00.000Z"
 ---
 ```
 

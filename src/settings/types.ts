@@ -1,3 +1,3 @@
-export interface GoogleMapsSyncSettings {
+export interface GoogleMapsImportSettings {
   outputFolder: string
 }

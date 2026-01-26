@@ -1,29 +1,29 @@
 import { Plugin } from 'obsidian'
-import { syncGoogleMapsSaved } from './commands/syncGoogleMapsSaved'
+import { importGoogleMapsSaved } from './commands/importGoogleMapsSaved'
 import { DEFAULT_SETTINGS } from './settings/constants'
-import { GoogleMapsSyncSettingTab } from './settings/GoogleMapsSyncSettingTab'
-import type { GoogleMapsSyncSettings } from './settings/types'
+import { GoogleMapsImportSettingTab } from './settings/GoogleMapsImportSettingTab'
+import type { GoogleMapsImportSettings } from './settings/types'
 
-export default class GoogleMapsSyncPlugin extends Plugin {
-  settings: GoogleMapsSyncSettings = DEFAULT_SETTINGS
+export default class GoogleMapsImportPlugin extends Plugin {
+  settings: GoogleMapsImportSettings = DEFAULT_SETTINGS
 
   override async onload(): Promise<void> {
     await this.loadSettings()
 
     this.addCommand({
-      id: 'sync-google-maps-saved',
-      name: 'Sync Google Maps Saved',
-      callback: () => syncGoogleMapsSaved(this.app, this.settings),
+      id: 'import-google-maps-saved',
+      name: 'Import Google Maps saved places',
+      callback: () => importGoogleMapsSaved(this.app, this.settings),
     })
 
-    this.addSettingTab(new GoogleMapsSyncSettingTab(this.app, this))
+    this.addSettingTab(new GoogleMapsImportSettingTab(this.app, this))
   }
 
   async loadSettings(): Promise<void> {
     this.settings = Object.assign(
       {},
       DEFAULT_SETTINGS,
-      (await this.loadData()) as Partial<GoogleMapsSyncSettings>,
+      (await this.loadData()) as Partial<GoogleMapsImportSettings>,
     )
   }
 
