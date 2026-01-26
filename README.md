@@ -4,9 +4,10 @@ Import your Google Maps saved places from Takeout export to your Obsidian vault.
 
 ## Features
 
-- Import saved places from Google Takeout export (GeoJSON and CSV)
-- Generate one note per place with coordinates for [Obsidian Bases](https://help.obsidian.md/bases) Map view (requires [obsidian-maps](https://github.com/obsidianmd/obsidian-maps))
-- Non-destructive import: existing places are detected by ID and skipped
+- Import all your Google Takeout files at once (GeoJSON and CSV supported)
+- Visualize your places on a map with [Obsidian Bases](https://help.obsidian.md/bases) Map view (requires [obsidian-maps](https://github.com/obsidianmd/obsidian-maps))
+- Tags are merged automatically when a place appears in multiple lists
+- Non-destructive: your notes and custom content are always preserved
 
 ## Installation
 
@@ -23,13 +24,15 @@ Import your Google Maps saved places from Takeout export to your Obsidian vault.
 3. Download and extract the archive
 4. Locate export files:
    - **GeoJSON**: `Saved Places.json` (includes coordinates)
-   - **CSV**: Files in the lists folder, e.g., `Favourites.csv` (no coordinates)
+   - **CSV**: Files in the lists folder, e.g., `Favourites.csv` (includes list names as tags)
+
+   Import both together to get coordinates with list tags.
 
 ### 2. Run the import command
 
 1. Open Command Palette (Cmd/Ctrl + P)
 2. Run **Import Google Maps saved places**
-3. Select a `.json` or `.csv` file
+3. Select the extracted folder (e.g., `~/Downloads/Takeout`)
 4. Notes will be created in your configured output folder
 
 ## Settings
@@ -54,9 +57,7 @@ last_imported_at: "2024-01-15T12:00:00.000Z"
 ---
 ```
 
-**Tags**: When importing from CSV, the list name (from the filename) is added as a `gmap/` prefixed tag. For example, importing `Favourites.csv` adds the tag `gmap/Favourites`. If the CSV contains a tags column, those are also included. Re-importing the same place from a different list will merge the tags.
-
-**Note**: CSV files do not include coordinates. Use GeoJSON for Map view.
+The `tags` field includes `gmap/` prefixed list names (e.g., `Favourites.csv` → `gmap/Favourites`) and any tags from the CSV column. Re-importing merges tags without duplication.
 
 ## Development
 

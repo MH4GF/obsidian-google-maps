@@ -72,6 +72,15 @@ Generated place notes include:
 - **Tags**: `gmap/` prefixed tags from CSV list names (e.g., `gmap/Favourites`), plus any CSV tags column values. Re-importing merges tags without duplication. User-added tags are preserved.
 - Body is empty, allowing users to freely add their own content
 
+## Import behavior
+
+- **Directory selection**: User selects a folder (typically the Takeout export folder) to import all CSV/JSON files at once
+- **Excluded files**: `クチコミ.json` is skipped (different format, not place data)
+- **Duplicate merging**: When the same place (by gmap_id) appears in multiple files:
+  - Tags from all occurrences are merged (deduplicated)
+  - Non-zero coordinates are preferred (GeoJSON has valid coords, CSV has 0,0)
+  - Non-empty optional fields (url, address, memo, comment) are preserved from any source
+
 ## Manifest rules (`manifest.json`)
 
 - Must include (non-exhaustive):  
